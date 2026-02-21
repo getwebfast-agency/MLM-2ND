@@ -27,6 +27,7 @@ router.get('/users/:id', getMemberDetails);
 router.get('/network', getFullNetwork);
 router.get('/sales', getSalesReports);
 router.get('/earnings', require('../controllers/adminController').getMemberEarnings);
+router.get('/earnings/:id', require('../controllers/adminController').getMemberEarningDetails);
 router.get('/categories', getCategoryStats);
 
 module.exports = router;

@@ -399,3 +399,39 @@ exports.getMemberEarnings = async (req, res) => {
         res.status(500).json({ message: 'Error fetching member earnings', error: error.message });
     }
 };
+
+exports.getMemberEarningDetails = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const commissions = await Commission.findAll({
+            where: { user_id: id },
+            include: [
+                {
+                    model: User,
+                    as: 'source',
+                    attributes: ['id', 'name', 'email']
+                },
+                {
+                    model: Order,
+                    attributes: ['id', 'total_amount', 'createdAt'],
+                    include: [
+                        {
+                            model: OrderItem,
+                            include: [
+                                {
+                                    model: Product,
+                                    attributes: ['id', 'name', 'price']
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            order: [['createdAt', 'DESC']]
+        });
+        res.json(commissions);
+    } catch (error) {
+        console.error('Error fetching member earning details:', error);
+        res.status(500).json({ message: 'Error fetching member earning details', error: error.message });
+    }
+};
