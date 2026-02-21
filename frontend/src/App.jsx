@@ -28,7 +28,7 @@ const AppContent = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
-            {!isAdmin && <Navbar />}
+            <Navbar />
             <div className="flex-grow">
                 <Routes>
                     <Route path="/" element={<Home />} />

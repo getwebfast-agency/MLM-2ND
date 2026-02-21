@@ -13,7 +13,7 @@ import AdminOrders from './admin/AdminOrders';
 
 const AdminDashboard = () => {
     return (
-        <div className="flex h-screen bg-gray-100">
+        <div className="flex bg-gray-100" style={{ height: 'calc(100vh - 4rem)' }}>
             <AdminSidebar />
             <div className="flex-1 overflow-auto">
                 <div className="p-8">

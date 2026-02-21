@@ -21,7 +21,7 @@ const AdminSidebar = () => {
     ];
 
     return (
-        <div className="bg-indigo-700 w-64 min-h-screen p-4">
+        <div className="bg-indigo-700 w-64 h-full p-4 overflow-auto">
             <div className="text-white text-xl font-bold mb-8 px-4">Admin Panel</div>
             <nav className="space-y-2">
                 {navItems.map((item) => (
