@@ -227,26 +227,32 @@ const AdminProducts = () => {
                             onChange={e => setProductForm({ ...productForm, description: e.target.value })}
                         />
 
-                        <div className="sm:col-span-2 grid grid-cols-1 gap-6 sm:grid-cols-2">
-                            <input
-                                type="number"
-                                placeholder="Referral Discount (%)"
-                                step="0.01"
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-white border"
-                                value={productForm.referral_discount_percent}
-                                onChange={e => setProductForm({ ...productForm, referral_discount_percent: e.target.value })}
-                            />
-                            <input
-                                type="number"
-                                placeholder="Member Commission (%)"
-                                step="0.01"
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-white border"
-                                value={productForm.member_commission_percent}
-                                onChange={e => setProductForm({ ...productForm, member_commission_percent: e.target.value })}
-                            />
+                        <div className="sm:col-span-2 grid grid-cols-1 gap-6 sm:grid-cols-2 mt-2">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Referral Discount (%)</label>
+                                <input
+                                    type="number"
+                                    placeholder="e.g. 10"
+                                    step="0.01"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-white border"
+                                    value={productForm.referral_discount_percent}
+                                    onChange={e => setProductForm({ ...productForm, referral_discount_percent: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Member Commission (%)</label>
+                                <input
+                                    type="number"
+                                    placeholder="e.g. 5"
+                                    step="0.01"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-white border"
+                                    value={productForm.member_commission_percent}
+                                    onChange={e => setProductForm({ ...productForm, member_commission_percent: e.target.value })}
+                                />
+                            </div>
                         </div>
-                        <div className="sm:col-span-2">
-                            <button type="submit" className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                        <div className="sm:col-span-2 mt-4">
+                            <button type="submit" className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 hover:shadow-md transition-shadow">
                                 Save Product
                             </button>
                         </div>
