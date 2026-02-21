@@ -102,11 +102,11 @@ const AdminProducts = () => {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
                 <h2 className="text-2xl font-bold text-gray-900">Product Management</h2>
                 <button
                     onClick={() => setShowProductForm(!showProductForm)}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                    className="inline-flex items-center justify-center w-full sm:w-auto px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition"
                 >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Product
@@ -251,8 +251,18 @@ const AdminProducts = () => {
                                 />
                             </div>
                         </div>
-                        <div className="sm:col-span-2 mt-4">
-                            <button type="submit" className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 hover:shadow-md transition-shadow">
+                        <div className="sm:col-span-2 mt-4 flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
+                            <button
+                                type="button"
+                                onClick={() => setShowProductForm(false)}
+                                className="w-full sm:w-auto inline-flex justify-center py-2 px-6 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="w-full sm:w-auto inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 hover:shadow-md transition-shadow"
+                            >
                                 Save Product
                             </button>
                         </div>
