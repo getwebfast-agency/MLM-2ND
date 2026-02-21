@@ -29,12 +29,12 @@ const Navbar = () => {
                     </div>
 
                     <div className="hidden md:flex flex-1 items-center justify-between ml-10">
-                        <div className="flex items-center space-x-4">
-                            <Link to="/" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</Link>
-                            <Link to="/products" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Products</Link>
-                            <Link to="/about" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">About Us</Link>
+                        <div className="flex-1 flex justify-center items-center space-x-1 lg:space-x-4">
+                            <Link to="/" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">Home</Link>
+                            <Link to="/products" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">Products</Link>
+                            <Link to="/about" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">About Us</Link>
 
-                            <Link to="/cart" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors relative">
+                            <Link to="/cart" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors relative whitespace-nowrap">
                                 Cart
                                 {cartCount > 0 && (
                                     <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
@@ -43,17 +43,17 @@ const Navbar = () => {
                                 )}
                             </Link>
 
-                            {user && <Link to="/orders" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">My Orders</Link>}
-                            {user && <Link to="/team" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">My Team</Link>}
+                            {user && <Link to="/orders" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">My Orders</Link>}
+                            {user && <Link to="/team" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">My Team</Link>}
 
                             {user && (
                                 user.role === 'admin' ? (
-                                    <Link to="/admin" className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
+                                    <Link to="/admin" className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap">
                                         <LayoutDashboard className="w-4 h-4 mr-2" />
                                         Admin
                                     </Link>
                                 ) : (
-                                    <Link to="/dashboard" className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
+                                    <Link to="/dashboard" className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap">
                                         <LayoutDashboard className="w-4 h-4 mr-2" />
                                         Dashboard
                                     </Link>
@@ -61,13 +61,13 @@ const Navbar = () => {
                             )}
                         </div>
 
-                        <div className="flex items-center">
+                        <div className="flex items-center ml-auto">
                             {user ? (
-                                <div className="border-l pl-4 flex items-center space-x-4">
-                                    <span className="text-sm text-gray-500 font-medium">Hi, {user.name}</span>
+                                <div className="border-l pl-4 flex items-center space-x-4 ml-4">
+                                    <span className="text-sm text-gray-500 font-medium whitespace-nowrap">Hi, {user.name}</span>
                                     <button
                                         onClick={handleLogout}
-                                        className="flex items-center text-red-600 hover:text-red-700 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                                        className="flex items-center text-red-600 hover:text-red-700 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap"
                                     >
                                         <LogOut className="w-4 h-4 mr-2" />
                                         Logout
@@ -75,8 +75,8 @@ const Navbar = () => {
                                 </div>
                             ) : (
                                 <div className="flex items-center space-x-4 ml-4">
-                                    <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-medium px-4 py-2">Login</Link>
-                                    <Link to="/register" className="bg-indigo-600 text-white px-5 py-2 rounded-full font-medium hover:bg-indigo-700 transition-shadow shadow-md hover:shadow-lg">
+                                    <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-medium px-4 py-2 whitespace-nowrap">Login</Link>
+                                    <Link to="/register" className="bg-indigo-600 text-white px-5 py-2 rounded-full font-medium hover:bg-indigo-700 transition-shadow shadow-md hover:shadow-lg whitespace-nowrap">
                                         Become a Member
                                     </Link>
                                 </div>
