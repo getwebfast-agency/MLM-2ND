@@ -41,30 +41,30 @@ const AdminOverview = () => {
             <h2 className="text-2xl font-bold mb-6">Dashboard Overview</h2>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <div className="bg-white overflow-hidden shadow rounded-lg p-5 flex items-center">
-                    <div className="bg-blue-500 rounded-md p-3 mr-5"><Users className="h-6 w-6 text-white" /></div>
+                    <div className="bg-blue-500 rounded-md p-3 mr-4"><Users className="h-6 w-6 text-white" /></div>
                     <div>
                         <p className="text-sm font-medium text-gray-500">Total Members</p>
-                        <p className="text-lg font-medium text-gray-900">{stats.totalMembers}</p>
+                        <p className="text-lg font-bold text-gray-900">{stats.totalMembers}</p>
                     </div>
                 </div>
                 <div className="bg-white overflow-hidden shadow rounded-lg p-5 flex items-center">
-                    <div className="bg-green-500 rounded-md p-3 mr-5"><Activity className="h-6 w-6 text-white" /></div>
+                    <div className="bg-green-500 rounded-md p-3 mr-4"><Activity className="h-6 w-6 text-white" /></div>
                     <div>
                         <p className="text-sm font-medium text-gray-500">Active Members</p>
-                        <p className="text-lg font-medium text-gray-900">{stats.activeMembers}</p>
+                        <p className="text-lg font-bold text-gray-900">{stats.activeMembers}</p>
                     </div>
                 </div>
                 <div className="bg-white overflow-hidden shadow rounded-lg p-5 flex items-center">
-                    <div className="bg-purple-500 rounded-md p-3 mr-5"><ShoppingBag className="h-6 w-6 text-white" /></div>
+                    <div className="bg-purple-500 rounded-md p-3 mr-4"><ShoppingBag className="h-6 w-6 text-white" /></div>
                     <div>
                         <p className="text-sm font-medium text-gray-500">New Today</p>
-                        <p className="text-lg font-medium text-gray-900">{stats.newRegistrations}</p>
+                        <p className="text-lg font-bold text-gray-900">{stats.newRegistrations}</p>
                     </div>
                 </div>
                 <div className="bg-white overflow-hidden shadow rounded-lg p-5 flex items-center">
-                    <div className="bg-yellow-500 rounded-md p-3 mr-5"><Activity className="h-6 w-6 text-white" /></div>
+                    <div className="bg-yellow-500 rounded-md p-3 mr-4"><Activity className="h-6 w-6 text-white" /></div>
                     <div>
                         <p className="text-sm font-medium text-gray-500">My Earnings</p>
                         <p className="text-lg font-bold text-gray-900">₹{stats.adminStats?.totalEarnings ? parseFloat(stats.adminStats.totalEarnings).toFixed(2) : '0.00'}</p>
@@ -74,20 +74,22 @@ const AdminOverview = () => {
 
             {/* Admin Referral Section */}
             <div className="bg-white shadow rounded-lg p-6 mb-8">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">My Referral Link</h3>
-                <div className="flex items-center space-x-4">
-                    <div className="flex-1 bg-gray-50 p-3 rounded border border-gray-200 text-gray-700 font-mono text-sm">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
+                    <h3 className="text-lg font-medium text-gray-900">My Referral Link</h3>
+                    <div className="text-sm text-gray-500 mt-1 sm:mt-0">
+                        Referral Code: <span className="font-bold text-gray-700">{stats.adminStats?.referralCode || 'N/A'}</span>
+                    </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex-1 bg-gray-50 p-3 rounded border border-gray-200 text-gray-700 font-mono text-sm break-all">
                         {frontendUrl}/register?ref={stats.adminStats?.referralCode || '...'}
                     </div>
                     <button
                         onClick={copyToClipboard}
-                        className={`px-4 py-2 rounded text-white font-medium transition-colors ${copied ? 'bg-green-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+                        className={`px-4 py-3 sm:py-2 flex-shrink-0 rounded text-white font-medium transition-colors ${copied ? 'bg-green-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}
                     >
                         {copied ? 'Copied!' : 'Copy Link'}
                     </button>
-                    <div className="text-sm text-gray-500">
-                        Code: <span className="font-bold text-gray-700">{stats.adminStats?.referralCode || 'N/A'}</span>
-                    </div>
                 </div>
             </div>
 
