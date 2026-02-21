@@ -22,16 +22,6 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/shop', require('./routes/orderRoutes'));
 
-app.get('/api/temp-delete-9999', async (req, res) => {
-    const { Order } = require('./models');
-    try {
-        const result = await Order.destroy({ where: { total_amount: 9999 } });
-        res.json({ message: 'Deleted ' + result + ' records' });
-    } catch (error) {
-        res.json({ error: error.message });
-    }
-});
-
 // Database Connection & Server Start
 const startServer = async () => {
     try {
