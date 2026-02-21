@@ -10,13 +10,24 @@ import AdminSales from './admin/AdminSales';
 import AdminEarnings from './admin/AdminEarnings';
 import AdminAnalytics from './admin/AdminAnalytics';
 import AdminOrders from './admin/AdminOrders';
+import { Menu } from 'lucide-react';
 
 const AdminDashboard = () => {
+    const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
     return (
-        <div className="flex bg-gray-100" style={{ height: 'calc(100vh - 4rem)' }}>
-            <AdminSidebar />
-            <div className="flex-1 overflow-auto">
-                <div className="p-8">
+        <div className="flex bg-gray-100 relative" style={{ height: 'calc(100vh - 4rem)' }}>
+            {/* Mobile Header / Toggle */}
+            <div className="md:hidden absolute top-0 left-0 w-full bg-indigo-700 text-white p-4 flex justify-between items-center z-20 shadow-md">
+                <span className="font-bold text-xl">Admin Panel</span>
+                <button onClick={() => setIsSidebarOpen(true)}>
+                    <Menu size={24} />
+                </button>
+            </div>
+
+            <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+
+            <div className="flex-1 overflow-auto w-full pt-16 md:pt-0">
+                <div className="p-4 md:p-8">
                     <Routes>
                         <Route path="/" element={<AdminOverview />} />
                         <Route path="members" element={<AdminMembers />} />
