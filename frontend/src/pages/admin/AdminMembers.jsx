@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Eye, Search, Filter, ChevronLeft, ChevronRight, RefreshCw, Download } from 'lucide-react';
 import API_URL from '../../config';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const AdminMembers = () => {
     const [users, setUsers] = useState([]);
@@ -96,6 +98,44 @@ const AdminMembers = () => {
         }
     };
 
+    const handleExportPDF = () => {
+        const doc = new jsPDF();
+
+        doc.setFontSize(18);
+        doc.text('Members List', 14, 22);
+
+        doc.setFontSize(11);
+        doc.setTextColor(100);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+
+        const tableColumn = ["Name", "Email", "Sponsor", "Ref Code", "Direct", "Team", "Status", "Joined"];
+        const tableRows = [];
+
+        users.forEach(member => {
+            const memberData = [
+                member.name,
+                member.email,
+                member.sponsor?.name || 'Root',
+                member.referral_code || '',
+                member.directReferrals?.toString() || '0',
+                member.totalDownline?.toString() || '0',
+                member.status,
+                new Date(member.createdAt).toLocaleDateString()
+            ];
+            tableRows.push(memberData);
+        });
+
+        autoTable(doc, {
+            head: [tableColumn],
+            body: tableRows,
+            startY: 40,
+            styles: { fontSize: 9 },
+            headStyles: { fillColor: [79, 70, 229] },
+        });
+
+        doc.save('members_export.pdf');
+    };
+
     const handleSearchChange = (e) => setSearchTerm(e.target.value);
     const handleStatusChange = (e) => setStatusFilter(e.target.value);
 
@@ -136,7 +176,11 @@ const AdminMembers = () => {
                     <button onClick={fetchUsers} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 text-gray-600">
                         <RefreshCw className="h-5 w-5" />
                     </button>
-                    <button className="flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    <button
+                        onClick={handleExportPDF}
+                        disabled={users.length === 0}
+                        className="flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                         <Download className="h-4 w-4 mr-2" />
                         Export
                     </button>
