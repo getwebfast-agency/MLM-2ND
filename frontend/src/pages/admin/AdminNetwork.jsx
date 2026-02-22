@@ -300,7 +300,7 @@ const AdminNetwork = () => {
                 </div>
             </div>
 
-            <div className="h-[calc(100vh-180px)] bg-gray-50 border rounded-lg shadow-sm w-full">
+            <div className="h-[calc(100vh-180px)] bg-gray-50 border rounded-lg shadow-sm w-full touch-none">
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
@@ -309,6 +309,11 @@ const AdminNetwork = () => {
                     nodeTypes={nodeTypes}
                     onNodeClick={(event, node) => setSelectedNode(node)}
                     fitView
+                    minZoom={0.05}
+                    maxZoom={3}
+                    zoomOnPinch={true}
+                    panOnScroll={true}
+                    panOnDrag={true}
                 >
                     <Background color="#f8fafc" gap={16} />
                     <Controls />
