@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Network, DollarSign, Users, RefreshCw, Copy, ShoppingBag, User as UserIcon, Calendar, Mail } from 'lucide-react';
+import { Network, IndianRupee, Users, RefreshCw, Copy, ShoppingBag, User as UserIcon, Calendar, Mail } from 'lucide-react';
 import API_URL from '../config';
 
 const TreeNode = ({ node }) => {
@@ -142,7 +142,7 @@ const Dashboard = () => {
                 {/* Quick Stats */}
                 <div className="col-span-1 lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="bg-white overflow-hidden shadow rounded-lg p-5 flex items-center">
-                        <div className="flex-shrink-0 bg-green-500 rounded-md p-3"><DollarSign className="h-6 w-6 text-white" /></div>
+                        <div className="flex-shrink-0 bg-green-500 rounded-md p-3"><IndianRupee className="h-6 w-6 text-white" /></div>
                         <div className="ml-5 w-0 flex-1">
                             <dt className="text-sm font-medium text-gray-500 truncate">Total Earnings</dt>
                             <dd className="text-2xl font-bold text-gray-900">₹{earnings.total.toFixed(2)}</dd>
@@ -235,7 +235,7 @@ const Dashboard = () => {
                 <div className="bg-white shadow sm:rounded-lg">
                     <div className="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
                         <h3 className="text-lg leading-6 font-medium text-gray-900 flex items-center">
-                            <DollarSign className="mr-2 h-5 w-5 text-gray-400" />
+                            <IndianRupee className="mr-2 h-5 w-5 text-gray-400" />
                             Recent Earnings
                         </h3>
                     </div>

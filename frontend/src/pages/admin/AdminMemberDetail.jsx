@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { User, DollarSign, ShoppingBag, ArrowLeft, Key, Users, Trash2 } from 'lucide-react';
+import { User, IndianRupee, ShoppingBag, ArrowLeft, Key, Users, Trash2 } from 'lucide-react';
 import API_URL from '../../config';
 
 const AdminMemberDetail = () => {
@@ -131,7 +131,7 @@ const AdminMemberDetail = () => {
                     </div>
                 </div>
                 <div className="bg-white overflow-hidden shadow rounded-lg p-5 flex items-center">
-                    <div className="bg-green-500 rounded-md p-3 mr-5"><DollarSign className="h-6 w-6 text-white" /></div>
+                    <div className="bg-green-500 rounded-md p-3 mr-5"><IndianRupee className="h-6 w-6 text-white" /></div>
                     <div>
                         <p className="text-sm font-medium text-gray-500">Total Earnings</p>
                         <p className="text-lg font-medium text-gray-900">₹{stats.totalEarnings}</p>
