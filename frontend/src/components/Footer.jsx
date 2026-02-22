@@ -5,10 +5,10 @@ const Footer = () => {
     return (
         <footer className="bg-gray-800 text-white mt-auto pt-10 pb-6">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                    <div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-8">
+                    <div className="col-span-2 md:col-span-1">
                         <h3 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent mb-4">Marathamall</h3>
-                        <p className="text-gray-400 text-sm">Empowering your future through our premium network and quality products.</p>
+                        <p className="text-gray-400 text-sm pr-4 md:pr-0">Empowering your future through our premium network and quality products.</p>
                     </div>
                     <div>
                         <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
@@ -28,7 +28,7 @@ const Footer = () => {
                             <li><Link to="#" className="hover:text-white">Privacy Policy</Link></li>
                         </ul>
                     </div>
-                    <div>
+                    <div className="col-span-2 md:col-span-1">
                         <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
                         <ul className="space-y-2 text-sm text-gray-400">
                             <li>Email: support@marathamall.com</li>
@@ -37,9 +37,9 @@ const Footer = () => {
                         </ul>
                     </div>
                 </div>
-                <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
-                    <p className="text-sm text-gray-500">&copy; {new Date().getFullYear()} Marathamall. All rights reserved.</p>
-                    <div className="flex space-x-6 mt-4 md:mt-0">
+                <div className="border-t border-gray-700 pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+                    <p className="text-sm text-gray-500 mb-4 md:mb-0">&copy; {new Date().getFullYear()} Marathamall. All rights reserved.</p>
+                    <div className="flex space-x-6">
                         <Link to="/admin" className="text-gray-500 hover:text-white text-sm">Admin Access</Link>
                     </div>
                 </div>
