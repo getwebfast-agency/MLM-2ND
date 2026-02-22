@@ -3,31 +3,11 @@ const jwt = require('jsonwebtoken');
 const { User, sequelize } = require('../models');
 const ReferralClosure = require('../models/ReferralClosure');
 
-exports.sendOTP = async (req, res) => {
-    try {
-        const { contact } = req.body;
-        if (!contact) return res.status(400).json({ message: 'Contact (Email or Phone) is required' });
-
-        const isEmail = contact.includes('@');
-        const existingUser = await User.findOne({ where: isEmail ? { email: contact } : { phone: contact } });
-        if (existingUser) return res.status(400).json({ message: 'Account already exists with this contact' });
-
-        // Simulate OTP sending
-        console.log(`Simulating sending OTP "123456" to ${contact}`);
-        res.json({ message: 'OTP sent successfully (Simulated: use 123456)' });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-};
 
 exports.register = async (req, res) => {
     const t = await sequelize.transaction();
     try {
-        const { name, contact, password, referral_code, otp } = req.body;
-
-        if (otp !== '123456') {
-            return res.status(400).json({ message: 'Invalid OTP' });
-        }
+        const { name, contact, password, referral_code } = req.body;
 
         // Validate sponsor
         const sponsor = await User.findOne({ where: { referral_code } });
