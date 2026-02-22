@@ -36,7 +36,7 @@ const Footer = () => {
                     <div>
                         <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
                         <ul className="space-y-2 text-sm text-gray-400">
-                            <li>Email: support@marathamall.com</li>
+                            <li>Email: Marathamall1@gmail.com</li>
                             <li>Phone: +91 123 456 7890</li>
                             <li>Address: Mumbai, Maharashtra</li>
                         </ul>
