@@ -10,6 +10,7 @@ import ProductDetail from './pages/ProductDetail';
 import Orders from './pages/Orders';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 import About from './pages/About';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
@@ -79,6 +80,7 @@ function App() {
         <AuthProvider>
             <CartProvider>
                 <Router>
+                    <ScrollToTop />
                     <AppContent />
                 </Router>
             </CartProvider>
