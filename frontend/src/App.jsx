@@ -11,6 +11,8 @@ import Orders from './pages/Orders';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import About from './pages/About';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import MyTeam from './pages/MyTeam';
 import Cart from './pages/Cart';
 import { CartProvider } from './context/CartContext';
@@ -33,6 +35,8 @@ const AppContent = () => {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/about" element={<About />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/privacy" element={<Privacy />} />
                     <Route path="/products" element={<Products />} />
                     <Route path="/products/:id" element={<ProductDetail />} />
                     <Route path="/cart" element={<Cart />} />
