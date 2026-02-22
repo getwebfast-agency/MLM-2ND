@@ -5,6 +5,7 @@ const Product = require('./Product');
 const Order = require('./Order');
 const OrderItem = require('./OrderItem');
 const Commission = require('./Commission');
+const Withdrawal = require('./Withdrawal');
 
 // User Associations
 User.hasMany(User, { as: 'referrals', foreignKey: 'sponsor_id' });
@@ -17,6 +18,10 @@ User.hasMany(Commission, { foreignKey: 'source_user_id', as: 'generated_commissi
 // Tree Associations
 ReferralClosure.belongsTo(User, { as: 'descendant', foreignKey: 'descendant_id' });
 ReferralClosure.belongsTo(User, { as: 'ancestor', foreignKey: 'ancestor_id' });
+
+// Withdrawal Associations
+Withdrawal.belongsTo(User, { foreignKey: 'user_id' });
+User.hasMany(Withdrawal, { foreignKey: 'user_id' });
 
 // Order Associations
 Order.belongsTo(User, { foreignKey: 'user_id' });
@@ -40,4 +45,5 @@ module.exports = {
     Order,
     OrderItem,
     Commission,
+    Withdrawal,
 };

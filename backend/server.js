@@ -21,6 +21,7 @@ app.use('/api/network', require('./routes/networkRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/shop', require('./routes/orderRoutes'));
+app.use('/api/withdrawals', require('./routes/withdrawalRoutes'));
 
 // Database Connection & Server Start
 const startServer = async () => {

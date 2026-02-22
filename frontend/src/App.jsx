@@ -16,6 +16,7 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import MyTeam from './pages/MyTeam';
 import Cart from './pages/Cart';
+import Withdrawals from './pages/Withdrawals';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -57,6 +58,14 @@ const AppContent = () => {
                         element={
                             <PrivateRoute>
                                 <MyTeam />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/withdrawals"
+                        element={
+                            <PrivateRoute>
+                                <Withdrawals />
                             </PrivateRoute>
                         }
                     />

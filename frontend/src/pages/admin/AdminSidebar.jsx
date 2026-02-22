@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, ShoppingBag, GitMerge, BarChart2, Tag, X } from 'lucide-react';
+import { LayoutDashboard, Users, ShoppingBag, GitMerge, BarChart2, Tag, X, CreditCard } from 'lucide-react';
 
 const AdminSidebar = ({ isOpen, setIsOpen }) => {
     const location = useLocation();
@@ -12,6 +12,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
     const navItems = [
         { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Overview' },
         { path: '/admin/orders', icon: <ShoppingBag size={20} />, label: 'Order Confirmation' },
+        { path: '/admin/withdrawals', icon: <CreditCard size={20} />, label: 'Withdrawal Requests' },
         { path: '/admin/members', icon: <Users size={20} />, label: 'Members' },
         { path: '/admin/earnings', icon: <BarChart2 size={20} />, label: 'Member Earnings' },
         { path: '/admin/network', icon: <GitMerge size={20} />, label: 'Network Tree' },

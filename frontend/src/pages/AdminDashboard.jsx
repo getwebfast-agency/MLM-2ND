@@ -10,6 +10,7 @@ import AdminSales from './admin/AdminSales';
 import AdminEarnings from './admin/AdminEarnings';
 import AdminAnalytics from './admin/AdminAnalytics';
 import AdminOrders from './admin/AdminOrders';
+import AdminWithdrawals from './admin/AdminWithdrawals';
 import { Menu } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -37,6 +38,7 @@ const AdminDashboard = () => {
                         <Route path="products" element={<AdminProducts />} />
                         <Route path="sales" element={<AdminSales />} />
                         <Route path="orders" element={<AdminOrders />} />
+                        <Route path="withdrawals" element={<AdminWithdrawals />} />
                         <Route path="analytics" element={<AdminAnalytics />} />
                     </Routes>
                 </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 import { Network, IndianRupee, Users, RefreshCw, Copy, ShoppingBag, User as UserIcon, Calendar, Mail } from 'lucide-react';
 import API_URL from '../config';
 
@@ -146,7 +147,7 @@ const Dashboard = () => {
                         <div className="ml-5 w-0 flex-1">
                             <dt className="text-sm font-medium text-gray-500 truncate">Total Earnings</dt>
                             <dd className="text-2xl font-bold text-gray-900">₹{earnings.total.toFixed(2)}</dd>
-                            <button className="mt-2 text-xs text-indigo-600 hover:text-indigo-900 font-medium">Request Withdrawal</button>
+                            <Link to="/withdrawals" className="mt-2 inline-block text-xs text-indigo-600 hover:text-indigo-900 font-medium">Request Withdrawal</Link>
                         </div>
                     </div>
 
