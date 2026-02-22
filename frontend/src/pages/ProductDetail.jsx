@@ -84,31 +84,31 @@ const ProductDetail = () => {
                 <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
                     {/* Image gallery */}
                     <div className="flex flex-col-reverse">
-                        <div className="w-full aspect-w-1 aspect-h-1 rounded-lg overflow-hidden bg-gray-100">
+                        <div className="w-full aspect-w-1 aspect-h-1 rounded-3xl overflow-hidden bg-white shadow-2xl shadow-gray-200 border border-gray-100 group">
                             <img
                                 src={product.image_url || 'https://via.placeholder.com/600'}
                                 alt={product.name}
-                                className="w-full h-full object-center object-cover"
+                                className="w-full h-full object-center object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                             />
                         </div>
                     </div>
 
                     {/* Product info */}
                     <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
-                        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">{product.name}</h1>
+                        <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">{product.name}</h1>
 
-                        <div className="mt-3">
+                        <div className="mt-4">
                             <h2 className="sr-only">Product information</h2>
-                            <p className="text-3xl text-indigo-600 font-bold">₹{product.price}</p>
+                            <p className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">₹{product.price}</p>
                         </div>
 
-                        <div className="mt-3 flex items-center">
-                            <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800 mr-4">
+                        <div className="mt-4 flex items-center">
+                            <span className="inline-flex items-center px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 mr-4 shadow-sm border border-indigo-100">
                                 {product.category || 'General'}
                             </span>
-                            <div className="flex items-center text-green-600">
-                                <CheckCircle className="w-4 h-4 mr-1" />
-                                <span className="text-sm font-medium">In Stock</span>
+                            <div className="flex items-center text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                                <CheckCircle className="w-4 h-4 mr-1.5" />
+                                <span className="text-xs font-bold uppercase tracking-wider">In Stock</span>
                             </div>
                         </div>
 
@@ -136,22 +136,22 @@ const ProductDetail = () => {
                             </div>
                         </div>
 
-                        <div className="mt-8 flex gap-4">
+                        <div className="mt-8 flex flex-col sm:flex-row gap-4">
                             <button
                                 type="button"
                                 onClick={handleAddToCart}
-                                className="flex-1 bg-white border border-indigo-600 rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-indigo-600 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                                className="flex-1 bg-white border-2 border-indigo-600 rounded-xl py-4 px-8 flex items-center justify-center text-lg font-bold text-indigo-600 hover:bg-indigo-50 hover:shadow-lg active:scale-95 transition-all duration-200"
                             >
-                                <ShoppingCart className="w-5 h-5 mr-2" />
+                                <ShoppingCart className="w-6 h-6 mr-2" />
                                 Add to Cart
                             </button>
                             <button
                                 type="button"
                                 onClick={handleBuyNow}
                                 disabled={processing}
-                                className={`flex-1 bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${processing ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                className={`flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 border border-transparent rounded-xl py-4 px-8 flex items-center justify-center text-lg font-bold text-white hover:from-indigo-700 hover:to-purple-700 hover:shadow-lg hover:shadow-indigo-200 active:scale-95 transition-all duration-200 ${processing ? 'opacity-70 cursor-not-allowed' : ''}`}
                             >
-                                {processing ? 'Processing...' : 'Buy Now'}
+                                {processing ? 'Processing...' : 'Buy Now Securely'}
                             </button>
                         </div>
 

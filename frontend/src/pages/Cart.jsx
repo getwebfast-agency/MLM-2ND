@@ -88,18 +88,20 @@ const Cart = () => {
     return (
         <div className="bg-white min-h-screen">
             <div className="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
-                <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 mb-10">Shopping Cart</h1>
+                <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 mb-10">
+                    Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Cart</span>
+                </h1>
 
                 <div className="mt-12 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start xl:gap-x-16">
                     <section aria-labelledby="cart-heading" className="lg:col-span-7">
-                        <ul role="list" className="border-t border-b border-gray-200 divide-y divide-gray-200">
+                        <ul role="list" className="space-y-6">
                             {cart.map((product) => (
-                                <li key={product.id} className="flex py-6 sm:py-10">
+                                <li key={product.id} className="flex py-6 sm:py-8 px-4 sm:px-6 bg-white border border-gray-100 rounded-3xl shadow-sm hover:shadow-lg transition-shadow duration-300 relative group">
                                     <div className="flex-shrink-0">
                                         <img
                                             src={product.image_url || 'https://via.placeholder.com/150'}
                                             alt={product.name}
-                                            className="w-24 h-24 rounded-md object-center object-cover sm:w-32 sm:h-32"
+                                            className="w-24 h-24 rounded-2xl object-center object-cover sm:w-32 sm:h-32 shadow-sm"
                                         />
                                     </div>
 
@@ -107,16 +109,16 @@ const Cart = () => {
                                         <div className="relative pr-9 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:pr-0">
                                             <div>
                                                 <div className="flex justify-between">
-                                                    <h3 className="text-sm">
-                                                        <Link to={`/products/${product.id}`} className="font-medium text-gray-700 hover:text-gray-800">
+                                                    <h3 className="text-lg">
+                                                        <Link to={`/products/${product.id}`} className="font-bold text-gray-900 hover:text-indigo-600 transition-colors">
                                                             {product.name}
                                                         </Link>
                                                     </h3>
                                                 </div>
                                                 <div className="mt-1 flex text-sm">
-                                                    <p className="text-gray-500">{product.category}</p>
+                                                    <p className="text-gray-500 bg-gray-50 px-2 py-0.5 rounded-md border border-gray-100">{product.category}</p>
                                                 </div>
-                                                <p className="mt-1 text-sm font-medium text-gray-900">₹{product.price}</p>
+                                                <p className="mt-2 text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">₹{product.price}</p>
 
                                                 <div className="mt-2 flex items-center text-sm text-green-600">
                                                     <svg className="flex-shrink-0 mr-1.5 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -130,27 +132,27 @@ const Cart = () => {
                                             </div>
 
                                             <div className="mt-4 sm:mt-0 sm:pr-9">
-                                                <div className="flex items-center border rounded-md w-max">
+                                                <div className="flex items-center border border-gray-200 rounded-xl w-max bg-gray-50/50 shadow-sm">
                                                     <button
                                                         onClick={() => updateQuantity(product.id, -1)}
-                                                        className="p-1 hover:bg-gray-100 text-gray-600"
+                                                        className="p-2 hover:bg-white rounded-l-xl text-gray-600 active:scale-95 transition-transform"
                                                     >
                                                         <Minus className="w-4 h-4" />
                                                     </button>
-                                                    <span className="px-3 text-sm font-medium">{product.quantity}</span>
+                                                    <span className="px-4 text-base font-bold">{product.quantity}</span>
                                                     <button
                                                         onClick={() => updateQuantity(product.id, 1)}
-                                                        className="p-1 hover:bg-gray-100 text-gray-600"
+                                                        className="p-2 hover:bg-white rounded-r-xl text-gray-600 active:scale-95 transition-transform"
                                                     >
                                                         <Plus className="w-4 h-4" />
                                                     </button>
                                                 </div>
 
-                                                <div className="absolute top-0 right-0">
+                                                <div className="absolute top-6 right-6 sm:top-8 sm:right-8">
                                                     <button
                                                         onClick={() => removeFromCart(product.id)}
                                                         type="button"
-                                                        className="-m-2 p-2 inline-flex text-gray-400 hover:text-gray-500"
+                                                        className="p-2 inline-flex text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
                                                     >
                                                         <span className="sr-only">Remove</span>
                                                         <Trash2 className="h-5 w-5" aria-hidden="true" />
@@ -167,10 +169,11 @@ const Cart = () => {
                     {/* Order summary */}
                     <section
                         aria-labelledby="summary-heading"
-                        className="mt-16 bg-gray-50 rounded-lg px-4 py-6 sm:p-6 lg:p-8 lg:mt-0 lg:col-span-5"
+                        className="mt-16 bg-white rounded-3xl shadow-2xl shadow-gray-200/50 border border-gray-100 px-6 py-8 sm:px-8 lg:mt-0 lg:col-span-5 relative overflow-hidden"
                     >
-                        <h2 id="summary-heading" className="text-lg font-medium text-gray-900">
-                            Order summary
+                        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+                        <h2 id="summary-heading" className="text-xl font-bold text-gray-900">
+                            Order Summary
                         </h2>
 
                         <div className="mt-6 space-y-4">
@@ -275,10 +278,10 @@ const Cart = () => {
                                         alert('Failed to create order. Please try again.');
                                     }
                                 }}
-                                className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-bold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 flex justify-center items-center"
+                                className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 border border-transparent rounded-2xl shadow-lg shadow-emerald-200 py-4 px-4 text-lg font-extrabold text-white hover:from-emerald-600 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 flex justify-center items-center group active:scale-95 transition-all duration-200"
                             >
-                                <span className="mr-2">Buy on WhatsApp</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" /></svg>
+                                <span className="mr-2">Buy securely on WhatsApp</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle group-hover:scale-110 transition-transform"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" /></svg>
                             </button>
                         </div>
 
