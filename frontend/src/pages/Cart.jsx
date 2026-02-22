@@ -3,15 +3,23 @@ import { useCart } from '../context/CartContext';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import API_URL, { WHATSAPP_NUMBER } from '../config';
 
 const Cart = () => {
     const { cart, removeFromCart, updateQuantity, clearCart, cartTotal, addToCart } = useCart();
+    const { user } = useAuth();
     const [suggestedProducts, setSuggestedProducts] = React.useState([]);
-    const [referralCode, setReferralCode] = React.useState('');
+    const [referralCode, setReferralCode] = React.useState(localStorage.getItem('referral_code') || (user ? user.referral_code : ''));
     const [referralDiscount, setReferralDiscount] = React.useState(0);
     const [referralMessage, setReferralMessage] = React.useState({ type: '', text: '' });
     const [isApplied, setIsApplied] = React.useState(false);
+
+    React.useEffect(() => {
+        if (!referralCode && user && user.referral_code) {
+            setReferralCode(user.referral_code);
+        }
+    }, [user, referralCode]);
 
     const handleApplyReferral = async () => {
         if (!referralCode) return;

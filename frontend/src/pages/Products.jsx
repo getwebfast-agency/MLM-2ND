@@ -1,13 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Share2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import API_URL from '../config';
 
 const Products = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const { addToCart } = useCart();
+    const { user } = useAuth();
+    const [searchParams] = useSearchParams();
+    const [copiedId, setCopiedId] = useState(null);
+
+    useEffect(() => {
+        const ref = searchParams.get('ref');
+        if (ref) {
+            localStorage.setItem('referral_code', ref);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -66,19 +78,35 @@ const Products = () => {
                                     </div>
                                     <p className="mt-2 text-sm text-gray-500 line-clamp-2 leading-relaxed">{product.description}</p>
                                 </Link>
-                                <button
-                                    onClick={() => addToCart(product)}
-                                    className="mt-6 w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 active:scale-95 transition-all duration-200 font-semibold"
-                                >
-                                    Add to Cart
-                                </button>
-                            </div>
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => addToCart(product)}
+                                        className="mt-6 flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 active:scale-95 transition-all duration-200 font-semibold"
+                                    >
+                                        Add to Cart
+                                    </button>
+                                    {user && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                const link = `${window.location.origin}/products/${product.id}?ref=${user.referral_code}`;
+                                                navigator.clipboard.writeText(link);
+                                                setCopiedId(product.id);
+                                                setTimeout(() => setCopiedId(null), 2000);
+                                            }}
+                                            className="mt-6 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 active:scale-95 transition-all duration-200 flex items-center justify-center border border-gray-200"
+                                            title="Share your referral link"
+                                        >
+                                            {copiedId === product.id ? <span className="text-sm font-medium">Copied!</span> : <Share2 className="w-5 h-5 text-indigo-600" />}
+                                        </button>
+                                    )}
+                                </div>
                         ))}
+                            </div>
+                        )}
                     </div>
-                )}
-            </div>
         </div>
-    );
+            );
 };
 
-export default Products;
+            export default Products;

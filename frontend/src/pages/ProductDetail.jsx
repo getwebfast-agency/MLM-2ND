@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShoppingCart, CheckCircle } from 'lucide-react';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, ShoppingCart, CheckCircle, Share2, Copy } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import API_URL, { WHATSAPP_NUMBER } from '../config';
@@ -13,6 +13,15 @@ const ProductDetail = () => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [processing, setProcessing] = useState(false);
+    const [searchParams] = useSearchParams();
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        const ref = searchParams.get('ref');
+        if (ref) {
+            localStorage.setItem('referral_code', ref);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -49,9 +58,12 @@ const ProductDetail = () => {
             const token = localStorage.getItem('token');
             const config = { headers: { Authorization: `Bearer ${token}` } };
 
+            const savedRef = localStorage.getItem('referral_code');
+
             // Create pending order
             const res = await axios.post(`${API_URL}/shop/orders`, {
-                items: [{ productId: product.id, quantity: 1 }]
+                items: [{ productId: product.id, quantity: 1 }],
+                referralCode: savedRef || null
             }, config);
 
             const orderId = res.data.orderId;
@@ -97,9 +109,26 @@ const ProductDetail = () => {
                     <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
                         <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">{product.name}</h1>
 
-                        <div className="mt-4">
-                            <h2 className="sr-only">Product information</h2>
-                            <p className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">₹{product.price}</p>
+                        <div className="mt-4 flex justify-between items-end">
+                            <div>
+                                <h2 className="sr-only">Product information</h2>
+                                <p className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">₹{product.price}</p>
+                            </div>
+
+                            {user && (
+                                <button
+                                    onClick={() => {
+                                        const link = `${window.location.origin}/products/${product.id}?ref=${user.referral_code}`;
+                                        navigator.clipboard.writeText(link);
+                                        setCopied(true);
+                                        setTimeout(() => setCopied(false), 2000);
+                                    }}
+                                    className="flex items-center text-sm font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors"
+                                >
+                                    {copied ? <CheckCircle className="w-4 h-4 mr-1.5" /> : <Share2 className="w-4 h-4 mr-1.5" />}
+                                    {copied ? 'Link Copied!' : 'Share with Referral'}
+                                </button>
+                            )}
                         </div>
 
                         <div className="mt-4 flex items-center">
