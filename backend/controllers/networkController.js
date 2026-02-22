@@ -13,7 +13,7 @@ exports.getTree = async (req, res) => {
                 {
                     model: User,
                     as: 'descendant',
-                    attributes: ['id', 'name', 'referral_code', 'sponsor_id', 'status', 'role', 'createdAt'],
+                    attributes: ['id', 'name', 'referral_code', 'sponsor_id', 'status', 'role', 'createdAt', 'email', 'phone'],
                 }
             ],
             order: [['depth', 'ASC']],
@@ -41,7 +41,7 @@ exports.getTree = async (req, res) => {
         const rootInTree = tree.find(u => u.id === userId);
         if (!rootInTree) {
             const rootUser = await User.findByPk(userId, {
-                attributes: ['id', 'name', 'referral_code', 'sponsor_id', 'status', 'role', 'createdAt']
+                attributes: ['id', 'name', 'referral_code', 'sponsor_id', 'status', 'role', 'createdAt', 'email', 'phone']
             });
             if (rootUser) {
                 tree.unshift({
@@ -63,7 +63,7 @@ exports.getDirectReferrals = async (req, res) => {
     try {
         const directs = await User.findAll({
             where: { sponsor_id: req.user.id },
-            attributes: ['id', 'name', 'email', 'status', 'createdAt']
+            attributes: ['id', 'name', 'email', 'phone', 'status', 'createdAt']
         });
         res.json(directs);
     } catch (error) {
@@ -110,7 +110,7 @@ exports.getDownline = async (req, res) => {
                 {
                     model: User,
                     as: 'descendant',
-                    attributes: ['id', 'name', 'email', 'status', 'createdAt', 'role']
+                    attributes: ['id', 'name', 'email', 'phone', 'status', 'createdAt', 'role']
                 }
             ],
             order: [['depth', 'ASC'], [sequelize.col('descendant.createdAt'), 'DESC']]
@@ -128,6 +128,7 @@ exports.getDownline = async (req, res) => {
                 id: g.descendant.id,
                 name: g.descendant.name,
                 email: g.descendant.email, // Consider masking this for privacy if needed
+                phone: g.descendant.phone,
                 status: g.descendant.status,
                 joinDate: g.descendant.createdAt,
                 level: g.depth,

@@ -64,8 +64,9 @@ const AdminMembers = () => {
                 if (searchTerm) {
                     const lowerTerm = searchTerm.toLowerCase();
                     filteredData = filteredData.filter(user =>
-                        user.name.toLowerCase().includes(lowerTerm) ||
-                        user.email.toLowerCase().includes(lowerTerm) ||
+                        (user.name && user.name.toLowerCase().includes(lowerTerm)) ||
+                        (user.email && user.email.toLowerCase().includes(lowerTerm)) ||
+                        (user.phone && user.phone.toLowerCase().includes(lowerTerm)) ||
                         (user.referral_code && user.referral_code.toLowerCase().includes(lowerTerm))
                     );
                 }
@@ -108,13 +109,13 @@ const AdminMembers = () => {
         doc.setTextColor(100);
         doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
 
-        const tableColumn = ["Name", "Email", "Sponsor", "Ref Code", "Direct", "Team", "Status", "Joined"];
+        const tableColumn = ["Name", "Contact Info", "Sponsor", "Ref Code", "Direct", "Team", "Status", "Joined"];
         const tableRows = [];
 
         users.forEach(member => {
             const memberData = [
                 member.name,
-                member.email,
+                member.email || member.phone || 'N/A',
                 member.sponsor?.name || 'Root',
                 member.referral_code || '',
                 member.directReferrals?.toString() || '0',
@@ -229,7 +230,7 @@ const AdminMembers = () => {
                                                     </div>
                                                     <div className="ml-4">
                                                         <div className="text-sm font-medium text-gray-900">{member.name}</div>
-                                                        <div className="text-sm text-gray-500">{member.email}</div>
+                                                        <div className="text-sm text-gray-500">{member.email || member.phone || 'No contact provided'}</div>
                                                     </div>
                                                 </div>
                                             </td>

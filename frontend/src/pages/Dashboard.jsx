@@ -26,6 +26,7 @@ const TreeNode = ({ node }) => {
                     <div>
                         <p className="text-sm font-medium text-gray-900">{node.name}</p>
                         <p className="text-xs text-gray-500">Ref: {node.referral_code}</p>
+                        <p className="text-xs text-gray-400">{node.email || node.phone || 'No contact provided'}</p>
                     </div>
                 </div>
             </div>
