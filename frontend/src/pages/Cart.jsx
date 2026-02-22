@@ -15,6 +15,17 @@ const Cart = () => {
     const [referralMessage, setReferralMessage] = React.useState({ type: '', text: '' });
     const [isApplied, setIsApplied] = React.useState(false);
 
+    // Shipping Details State
+    const [shippingDetails, setShippingDetails] = React.useState({
+        name: user ? user.name : '',
+        phone: user ? (user.phone || '') : '',
+        address: ''
+    });
+
+    const handleShippingChange = (e) => {
+        setShippingDetails({ ...shippingDetails, [e.target.name]: e.target.value });
+    };
+
     React.useEffect(() => {
         if (!referralCode && user && user.referral_code) {
             setReferralCode(user.referral_code);
@@ -265,6 +276,50 @@ const Cart = () => {
                                 <dt className="text-lg font-bold text-gray-900">Order Total</dt>
                                 <dd className="text-lg font-bold text-indigo-600">₹{finalTotal.toFixed(2)}</dd>
                             </div>
+
+                            {/* Shipping Details Form */}
+                            <div className="border-t border-gray-200 pt-6 mt-6">
+                                <h3 className="text-lg font-medium text-gray-900 mb-4">Shipping Details</h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name *</label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            id="name"
+                                            required
+                                            value={shippingDetails.name}
+                                            onChange={handleShippingChange}
+                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number *</label>
+                                        <input
+                                            type="tel"
+                                            name="phone"
+                                            id="phone"
+                                            required
+                                            value={shippingDetails.phone}
+                                            onChange={handleShippingChange}
+                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="address" className="block text-sm font-medium text-gray-700">Full Address *</label>
+                                        <textarea
+                                            name="address"
+                                            id="address"
+                                            rows="3"
+                                            required
+                                            value={shippingDetails.address}
+                                            onChange={handleShippingChange}
+                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                            placeholder="Street, City, State, ZIP"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="mt-6">
@@ -274,8 +329,12 @@ const Cart = () => {
                                     try {
                                         const token = localStorage.getItem('token');
                                         if (!token) {
-                                            // Handle not logged in (redirect to login)
                                             window.location.href = '/login';
+                                            return;
+                                        }
+
+                                        if (!shippingDetails.name || !shippingDetails.phone || !shippingDetails.address) {
+                                            alert("Please fill in all shipping details.");
                                             return;
                                         }
 
@@ -297,10 +356,10 @@ const Cart = () => {
 
                                         // WhatsApp Message
                                         const itemsList = cart.map(item => `- ${item.name} (x${item.quantity})`).join('\n');
-                                        let message = `Hello, I want to confirm my order #${orderId}.\n\nItems:\n${itemsList}\n\n*Total: ₹${finalTotal.toFixed(2)}*`;
+                                        let message = `Hello, I want to confirm my order #${orderId}.\n\n*Items:*\n${itemsList}\n\n*Total:* ₹${finalTotal.toFixed(2)}\n\n*Shipping Details:*\nName: ${shippingDetails.name}\nPhone: ${shippingDetails.phone}\nAddress: ${shippingDetails.address}`;
 
                                         if (isApplied && referralCode) {
-                                            message += `\n\nReferral Code: ${referralCode}`;
+                                            message += `\n\n*Referral Code:* ${referralCode}`;
                                         }
 
                                         const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;

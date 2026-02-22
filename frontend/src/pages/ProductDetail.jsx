@@ -16,6 +16,17 @@ const ProductDetail = () => {
     const [searchParams] = useSearchParams();
     const [copied, setCopied] = useState(false);
 
+    // Shipping Details State
+    const [shippingDetails, setShippingDetails] = useState({
+        name: user ? user.name : '',
+        phone: user ? (user.phone || '') : '',
+        address: ''
+    });
+
+    const handleShippingChange = (e) => {
+        setShippingDetails({ ...shippingDetails, [e.target.name]: e.target.value });
+    };
+
     useEffect(() => {
         const ref = searchParams.get('ref');
         if (ref) {
@@ -51,6 +62,11 @@ const ProductDetail = () => {
             return;
         }
 
+        if (!shippingDetails.name || !shippingDetails.phone || !shippingDetails.address) {
+            alert("Please fill in all shipping details.");
+            return;
+        }
+
         if (!window.confirm(`Confirm purchase of ${product.name} for ₹${product.price}?`)) return;
 
         setProcessing(true);
@@ -69,7 +85,7 @@ const ProductDetail = () => {
             const orderId = res.data.orderId;
 
             // Redirect to WhatsApp with Order ID
-            const message = `Hello, I want to confirm my order #${orderId}.\n\nProduct: ${product.name}\nPrice: ₹${product.price}`;
+            const message = `Hello, I want to confirm my order #${orderId}.\n\n*Product:* ${product.name}\n*Price:* ₹${product.price}\n\n*Shipping Details:*\nName: ${shippingDetails.name}\nPhone: ${shippingDetails.phone}\nAddress: ${shippingDetails.address}`;
             const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
 
@@ -162,6 +178,50 @@ const ProductDetail = () => {
                             <div className="flex items-center text-sm text-gray-500">
                                 <span className="w-8 flex justify-center"><i className="text-xl">🛡️</i></span>
                                 <span className="ml-3">Secure Payment</span>
+                            </div>
+                        </div>
+
+                        {/* Shipping Details Form */}
+                        <div className="mt-8 border-t border-gray-200 pt-6">
+                            <h3 className="text-lg font-medium text-gray-900 mb-4">Shipping Details</h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name *</label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        id="name"
+                                        required
+                                        value={shippingDetails.name}
+                                        onChange={handleShippingChange}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number *</label>
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        id="phone"
+                                        required
+                                        value={shippingDetails.phone}
+                                        onChange={handleShippingChange}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="address" className="block text-sm font-medium text-gray-700">Full Address *</label>
+                                    <textarea
+                                        name="address"
+                                        id="address"
+                                        rows="3"
+                                        required
+                                        value={shippingDetails.address}
+                                        onChange={handleShippingChange}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                        placeholder="Street, City, State, ZIP"
+                                    />
+                                </div>
                             </div>
                         </div>
 
