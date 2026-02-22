@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import API_URL from '../config';
 
 const Register = () => {
@@ -108,6 +108,12 @@ const Register = () => {
                         >
                             Register
                         </button>
+                    </div>
+                    <div className="text-center mt-4">
+                        <span className="text-sm text-gray-600">Already have an account? </span>
+                        <Link to="/login" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                            Log in
+                        </Link>
                     </div>
                 </form>
             </div>

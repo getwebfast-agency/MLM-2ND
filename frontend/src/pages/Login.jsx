@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import API_URL from '../config';
 
 const Login = () => {
@@ -64,6 +64,12 @@ const Login = () => {
                         >
                             Sign in
                         </button>
+                    </div>
+                    <div className="text-center mt-4">
+                        <span className="text-sm text-gray-600">Don't have an account? </span>
+                        <Link to="/register" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                            Become a member
+                        </Link>
                     </div>
                 </form>
             </div>
