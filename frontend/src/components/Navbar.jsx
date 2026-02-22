@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { Menu, X, User, LogOut, LayoutDashboard, ShoppingCart } from 'lucide-react';
 
 import { useCart } from '../context/CartContext';
 
@@ -84,7 +84,15 @@ const Navbar = () => {
                         </div>
                     </div>
 
-                    <div className="md:hidden flex items-center">
+                    <div className="md:hidden flex items-center space-x-4">
+                        <Link to="/cart" className="text-gray-700 hover:text-indigo-600 focus:outline-none relative">
+                            <ShoppingCart className="w-6 h-6" />
+                            {cartCount > 0 && (
+                                <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                                    {cartCount}
+                                </span>
+                            )}
+                        </Link>
                         <button onClick={() => setIsOpen(!isOpen)} className="text-gray-700 hover:text-indigo-600 focus:outline-none">
                             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>
@@ -99,6 +107,9 @@ const Navbar = () => {
                         <Link to="/" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Home</Link>
                         <Link to="/products" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Products</Link>
                         <Link to="/about" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">About Us</Link>
+                        <Link to="/cart" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">
+                            Cart {cartCount > 0 && <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">{cartCount}</span>}
+                        </Link>
                         {user ? (
                             <>
                                 <Link to="/orders" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">My Orders</Link>
