@@ -11,7 +11,8 @@ const {
     getCategoryStats,
     resetUserPassword,
     changeSponsor,
-    deleteUser
+    deleteUser,
+    getChartStats
 } = require('../controllers/adminController');
 
 router.use(authenticateToken);
@@ -19,6 +20,7 @@ router.use(isAdmin);
 
 router.get('/users', getAllUsers);
 router.get('/stats', getSystemStats);
+router.get('/chart-stats', getChartStats);
 router.put('/users/:id/status', updateUserStatus);
 router.put('/users/:id/password', resetUserPassword);
 router.put('/users/:id/sponsor', changeSponsor);

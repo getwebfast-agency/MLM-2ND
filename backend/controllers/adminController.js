@@ -118,6 +118,24 @@ exports.getSystemStats = async (req, res) => {
     }
 };
 
+exports.getChartStats = async (req, res) => {
+    try {
+        const users = await User.findAll({
+            attributes: ['id', 'createdAt']
+        });
+
+        const orders = await Order.findAll({
+            where: { status: 'completed' },
+            attributes: ['id', 'total_amount', 'createdAt']
+        });
+
+        res.json({ users, orders });
+    } catch (error) {
+        console.error('Error fetching chart stats:', error);
+        res.status(500).json({ message: 'Error fetching chart stats', error: error.message });
+    }
+};
+
 exports.updateUserStatus = async (req, res) => {
     try {
         const { id } = req.params;

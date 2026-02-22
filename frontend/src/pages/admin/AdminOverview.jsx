@@ -2,11 +2,16 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Users, Activity, ShoppingBag } from 'lucide-react';
 import API_URL from '../../config';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const AdminOverview = () => {
     const [stats, setStats] = useState({ totalMembers: 0, activeMembers: 0, newRegistrations: 0 });
     const [loading, setLoading] = useState(true);
     const [copied, setCopied] = useState(false);
+
+    // Charts state
+    const [chartDataResponse, setChartDataResponse] = useState({ users: [], orders: [] });
+    const [timeFilter, setTimeFilter] = useState('day'); // 'day', 'week', 'month'
 
     const token = localStorage.getItem('token');
     const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -17,6 +22,13 @@ const AdminOverview = () => {
             try {
                 const res = await axios.get(`${API_URL}/admin/stats`, config);
                 setStats(res.data);
+
+                // Fetch chart data separately
+                const chartRes = await axios.get(`${API_URL}/admin/chart-stats`, config);
+                if (chartRes.data) {
+                    setChartDataResponse(chartRes.data);
+                }
+
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching stats:', error);
@@ -34,7 +46,56 @@ const AdminOverview = () => {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    if (loading) return <div>Loading stats...</div>;
+    const processData = (items, type) => {
+        const dataObj = {};
+
+        items.forEach(item => {
+            const date = new Date(item.createdAt);
+            let dateKey;
+            let displayLabel;
+
+            if (timeFilter === 'day') {
+                dateKey = date.toISOString().split('T')[0];
+                displayLabel = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            } else if (timeFilter === 'week') {
+                const day = date.getDay();
+                const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+                const startOfWeek = new Date(new Date(date).setDate(diff));
+                dateKey = startOfWeek.toISOString().split('T')[0];
+                displayLabel = `Week of ${startOfWeek.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
+            } else if (timeFilter === 'month') {
+                dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                displayLabel = date.toLocaleString('default', { month: 'short', year: 'numeric' });
+            }
+
+            if (!dataObj[dateKey]) {
+                dataObj[dateKey] = { date: dateKey, display: displayLabel, value: 0 };
+            }
+
+            if (type === 'sales') {
+                dataObj[dateKey].value += parseFloat(item.total_amount || 0);
+            } else {
+                dataObj[dateKey].value += 1;
+            }
+        });
+
+        // Convert the object to an array and sort by the raw date key
+        const arr = Object.values(dataObj);
+        arr.sort((a, b) => a.date.localeCompare(b.date));
+
+        // Take an appropriate slice if there's a lot of data, depending on the filter.
+        // For day, last 30 entries. For week, last 12. For month, last 12.
+        if (timeFilter === 'day') return arr.slice(-30);
+        if (timeFilter === 'week') return arr.slice(-12);
+        if (timeFilter === 'month') return arr.slice(-12);
+
+        return arr;
+    };
+
+    const salesChartData = processData(chartDataResponse.orders, 'sales');
+    const membersChartData = processData(chartDataResponse.users, 'members');
+
+    if (loading) return <div className="p-10 text-center">Loading stats...</div>;
 
     return (
         <div>
@@ -93,10 +154,66 @@ const AdminOverview = () => {
                 </div>
             </div>
 
-            {/* Placeholder for charts or recent activity */}
-            <div className="bg-white shadow rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">System Activity</h3>
-                <p className="text-gray-500">Charts and detailed analytics will appear here.</p>
+            {/* Charts Section */}
+            <div className="bg-white shadow rounded-lg p-6 mb-8">
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+                    <h3 className="text-xl font-bold text-gray-900">System Analytics</h3>
+                    <div className="flex gap-2 mt-4 sm:mt-0">
+                        {['day', 'week', 'month'].map(f => (
+                            <button
+                                key={f}
+                                onClick={() => setTimeFilter(f)}
+                                className={`px-4 py-1 rounded capitalize text-sm font-medium transition-colors ${timeFilter === f ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                            >
+                                {f}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    {/* Sales Chart */}
+                    <div className="border border-gray-100 p-4 rounded-xl bg-gray-50/50">
+                        <h4 className="text-md font-semibold text-gray-700 mb-4 capitalize">Sales ({timeFilter})</h4>
+                        {salesChartData.length > 0 ? (
+                            <div className="h-72 w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={salesChartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                        <XAxis dataKey="display" tick={{ fontSize: 12 }} />
+                                        <YAxis tick={{ fontSize: 12 }} />
+                                        <Tooltip labelStyle={{ color: '#374151' }} itemStyle={{ color: '#4f46e5' }} />
+                                        <Legend />
+                                        <Line type="monotone" dataKey="value" name="Total Revenue (₹)" stroke="#4f46e5" strokeWidth={3} activeDot={{ r: 8 }} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        ) : (
+                            <div className="h-72 flex items-center justify-center text-gray-400">No Data Available</div>
+                        )}
+                    </div>
+
+                    {/* Members Join Chart */}
+                    <div className="border border-gray-100 p-4 rounded-xl bg-gray-50/50">
+                        <h4 className="text-md font-semibold text-gray-700 mb-4 capitalize">Member Joins ({timeFilter})</h4>
+                        {membersChartData.length > 0 ? (
+                            <div className="h-72 w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={membersChartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                        <XAxis dataKey="display" tick={{ fontSize: 12 }} />
+                                        <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+                                        <Tooltip labelStyle={{ color: '#374151' }} itemStyle={{ color: '#10b981' }} />
+                                        <Legend />
+                                        <Line type="monotone" dataKey="value" name="New Members" stroke="#10b981" strokeWidth={3} activeDot={{ r: 8 }} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        ) : (
+                            <div className="h-72 flex items-center justify-center text-gray-400">No Data Available</div>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );
