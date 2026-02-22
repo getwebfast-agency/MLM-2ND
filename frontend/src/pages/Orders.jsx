@@ -68,6 +68,39 @@ const Orders = () => {
                                             <span className="font-bold text-gray-900">₹{order.total_amount}</span>
                                         </div>
                                     </div>
+
+                                    {/* Order Items Details */}
+                                    {order.OrderItems && order.OrderItems.length > 0 && (
+                                        <div className="mt-4 border-t border-gray-100 pt-4">
+                                            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Items Ordered:</h4>
+                                            <ul className="space-y-3">
+                                                {order.OrderItems.map((item) => (
+                                                    <li key={item.id} className="flex items-center space-x-4">
+                                                        <div className="flex-shrink-0 h-10 w-10">
+                                                            {item.Product?.image_url ? (
+                                                                <img className="h-10 w-10 rounded-md object-cover" src={item.Product.image_url} alt={item.Product.name} />
+                                                            ) : (
+                                                                <div className="h-10 w-10 rounded-md bg-gray-200 flex items-center justify-center">
+                                                                    <Package className="h-6 w-6 text-gray-400" />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-medium text-gray-900 truncate">
+                                                                {item.Product?.name || 'Unknown Product'}
+                                                            </p>
+                                                            <p className="text-sm text-gray-500">
+                                                                Qty: {item.quantity} × ₹{item.price}
+                                                            </p>
+                                                        </div>
+                                                        <div className="inline-flex items-center text-sm font-semibold text-gray-900">
+                                                            ₹{(item.quantity * item.price).toFixed(2)}
+                                                        </div>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
                                 </div>
                             </li>
                         ))}
