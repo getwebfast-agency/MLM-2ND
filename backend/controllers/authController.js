@@ -104,7 +104,7 @@ exports.login = async (req, res) => {
 
         const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET || 'supersecretkey', { expiresIn: '1d' });
 
-        res.json({ token, user: { id: user.id, name: user.name, role: user.role, referral_code: user.referral_code } });
+        res.json({ token, user: { id: user.id, name: user.name, role: user.role, referral_code: user.referral_code, email: user.email, phone: user.phone } });
 
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });

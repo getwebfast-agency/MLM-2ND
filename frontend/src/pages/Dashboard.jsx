@@ -122,7 +122,7 @@ const Dashboard = () => {
                         </div>
                         <div className="space-y-3">
                             <div className="flex items-center text-sm text-gray-500">
-                                <Mail className="mr-2 h-4 w-4" /> {user.email}
+                                <Mail className="mr-2 h-4 w-4" /> {user.email || user.phone || 'No contact provided'}
                             </div>
                             <div className="flex items-center text-sm text-gray-500">
                                 <UserIcon className="mr-2 h-4 w-4" /> Role: {user.role}
