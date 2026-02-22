@@ -101,12 +101,13 @@ const Products = () => {
                                         </button>
                                     )}
                                 </div>
-                        ))}
                             </div>
-                        )}
+                        ))}
                     </div>
+                )}
+            </div>
         </div>
-            );
+    );
 };
 
-            export default Products;
+export default Products;
