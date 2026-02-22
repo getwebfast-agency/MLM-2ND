@@ -5,10 +5,10 @@ const Footer = () => {
     return (
         <footer className="bg-gray-800 text-white mt-auto pt-10 pb-6">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-8">
-                    <div className="col-span-2 md:col-span-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+                    <div>
                         <h3 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent mb-4">Marathamall</h3>
-                        <p className="text-gray-400 text-sm pr-4 md:pr-0">Empowering your future through our premium network and quality products.</p>
+                        <p className="text-gray-400 text-sm">Empowering your future through our premium network and quality products.</p>
                     </div>
                     <div>
                         <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
@@ -20,7 +20,7 @@ const Footer = () => {
                             <li><Link to="/register" className="hover:text-white">Join Us</Link></li>
                         </ul>
                     </div>
-                    <div className="col-span-2 md:col-span-1">
+                    <div>
                         <h4 className="text-lg font-semibold mb-4">Support</h4>
                         <ul className="space-y-2 text-sm text-gray-400">
                             <li>
@@ -33,7 +33,7 @@ const Footer = () => {
                             <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
                         </ul>
                     </div>
-                    <div className="col-span-2 md:col-span-1">
+                    <div>
                         <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
                         <ul className="space-y-2 text-sm text-gray-400">
                             <li>Email: support@marathamall.com</li>
