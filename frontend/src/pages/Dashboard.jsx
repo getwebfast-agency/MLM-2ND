@@ -127,6 +127,9 @@ const Dashboard = () => {
                             <div className="flex items-center text-sm text-gray-500">
                                 <UserIcon className="mr-2 h-4 w-4" /> Role: {user.role}
                             </div>
+                            <div className="flex items-center text-sm text-gray-500">
+                                <Copy className="mr-2 h-4 w-4" /> Ref Code: <span className="ml-1 font-mono font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">{user.referral_code}</span>
+                            </div>
                             {/* Simplified Date display */}
                             <div className="flex items-center text-sm text-gray-500">
                                 <Calendar className="mr-2 h-4 w-4" /> Joined: {new Date().toLocaleDateString()}

@@ -90,6 +90,9 @@ const MyTeam = () => {
                                     Member
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Ref Code
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Level
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -121,6 +124,27 @@ const MyTeam = () => {
                                                     <div className="text-sm font-medium text-gray-900">{member.name}</div>
                                                     <div className="text-sm text-gray-500">{member.email}</div>
                                                 </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center space-x-2">
+                                                <span className="px-2 py-1 text-xs font-mono font-semibold bg-gray-100 text-gray-800 rounded">
+                                                    {member.referral_code || 'N/A'}
+                                                </span>
+                                                {member.referral_code && (
+                                                    <button
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(member.referral_code);
+                                                            alert('Referral Code copied: ' + member.referral_code);
+                                                        }}
+                                                        className="text-gray-400 hover:text-indigo-600 focus:outline-none"
+                                                        title="Copy Code"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                        </svg>
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
