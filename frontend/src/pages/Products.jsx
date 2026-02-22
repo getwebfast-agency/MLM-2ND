@@ -42,7 +42,7 @@ const Products = () => {
                         {products.map((product) => (
                             <div key={product.id} className="group relative bg-white border border-gray-100 rounded-2xl p-5 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
                                 <Link to={`/products/${product.id}`} className="block flex-grow">
-                                    <div className="w-full min-h-64 bg-gray-50 rounded-xl overflow-hidden relative">
+                                    <div className="w-full h-56 sm:h-64 bg-gray-50 rounded-xl overflow-hidden relative">
                                         <img
                                             src={product.image_url || 'https://via.placeholder.com/300?text=No+Image'}
                                             alt={product.name}

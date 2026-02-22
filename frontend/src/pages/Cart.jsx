@@ -6,7 +6,7 @@ import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from 'lucide-react';
 import API_URL, { WHATSAPP_NUMBER } from '../config';
 
 const Cart = () => {
-    const { cart, removeFromCart, updateQuantity, clearCart, cartTotal } = useCart();
+    const { cart, removeFromCart, updateQuantity, clearCart, cartTotal, addToCart } = useCart();
     const [suggestedProducts, setSuggestedProducts] = React.useState([]);
     const [referralCode, setReferralCode] = React.useState('');
     const [referralDiscount, setReferralDiscount] = React.useState(0);
@@ -69,14 +69,40 @@ const Cart = () => {
                     <div className="mt-16 w-full max-w-7xl">
                         <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">Trending Now</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {suggestedProducts.map(product => (
-                                <Link key={product.id} to={`/products/${product.id}`} className="group bg-white border rounded-lg p-4 hover:shadow-md transition">
-                                    <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 h-40">
-                                        <img src={product.image_url} alt={product.name} className="h-full w-full object-cover object-center" />
-                                    </div>
-                                    <h3 className="mt-4 text-sm text-gray-700">{product.name}</h3>
-                                    <p className="mt-1 text-lg font-medium text-gray-900">₹{product.price}</p>
-                                </Link>
+                            {suggestedProducts.map((product) => (
+                                <div key={product.id} className="group relative bg-white border border-gray-100 rounded-2xl p-5 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                                    <Link to={`/products/${product.id}`} className="block flex-grow">
+                                        <div className="w-full h-56 sm:h-64 bg-gray-50 rounded-xl overflow-hidden relative">
+                                            <img
+                                                src={product.image_url || 'https://via.placeholder.com/300?text=No+Image'}
+                                                alt={product.name}
+                                                className="w-full h-full object-center object-cover group-hover:scale-105 transition-transform duration-500"
+                                            />
+                                            <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-gray-800 shadow-sm">
+                                                {product.category || 'General'}
+                                            </div>
+                                        </div>
+                                        <div className="mt-5 flex justify-between items-start">
+                                            <div className="pr-4">
+                                                <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                                                    {product.name}
+                                                </h3>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                                                    ₹{product.price}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <p className="mt-2 text-sm text-gray-500 line-clamp-2 leading-relaxed">{product.description}</p>
+                                    </Link>
+                                    <button
+                                        onClick={(e) => { e.preventDefault(); addToCart(product); }}
+                                        className="mt-6 w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 active:scale-95 transition-all duration-200 font-semibold"
+                                    >
+                                        Add to Cart
+                                    </button>
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -315,15 +341,40 @@ const Cart = () => {
                         <div className="mt-24 w-full">
                             <h3 className="text-2xl font-bold text-gray-900 mb-6">You might also like</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {suggestedProducts.map(product => (
-                                    <Link key={product.id} to={`/products/${product.id}`} className="group bg-white border rounded-lg p-4 hover:shadow-lg transition">
-                                        <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 h-48">
-                                            <img src={product.image_url} alt={product.name} className="h-full w-full object-cover object-center" />
-                                        </div>
-                                        <h3 className="mt-4 text-sm font-medium text-gray-900">{product.name}</h3>
-                                        <p className="mt-1 text-sm text-gray-500">{product.category}</p>
-                                        <p className="mt-1 text-lg font-bold text-indigo-600">₹{product.price}</p>
-                                    </Link>
+                                {suggestedProducts.map((product) => (
+                                    <div key={product.id} className="group relative bg-white border border-gray-100 rounded-2xl p-5 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                                        <Link to={`/products/${product.id}`} className="block flex-grow">
+                                            <div className="w-full h-56 sm:h-64 bg-gray-50 rounded-xl overflow-hidden relative">
+                                                <img
+                                                    src={product.image_url || 'https://via.placeholder.com/300?text=No+Image'}
+                                                    alt={product.name}
+                                                    className="w-full h-full object-center object-cover group-hover:scale-105 transition-transform duration-500"
+                                                />
+                                                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-gray-800 shadow-sm">
+                                                    {product.category || 'General'}
+                                                </div>
+                                            </div>
+                                            <div className="mt-5 flex justify-between items-start">
+                                                <div className="pr-4">
+                                                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                                                        {product.name}
+                                                    </h3>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                                                        ₹{product.price}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <p className="mt-2 text-sm text-gray-500 line-clamp-2 leading-relaxed">{product.description}</p>
+                                        </Link>
+                                        <button
+                                            onClick={(e) => { e.preventDefault(); addToCart(product); }}
+                                            className="mt-6 w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 active:scale-95 transition-all duration-200 font-semibold"
+                                        >
+                                            Add to Cart
+                                        </button>
+                                    </div>
                                 ))}
                             </div>
                         </div>

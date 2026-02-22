@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import API_URL from '../config';
 import { ArrowRight, CheckCircle, TrendingUp, Users, ShieldCheck, Star } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
 const Home = () => {
     const [featuredProducts, setFeaturedProducts] = useState([]);
+    const { addToCart } = useCart();
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -110,26 +112,38 @@ const Home = () => {
                     </div>
                     <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:gap-x-8">
                         {featuredProducts.map((product) => (
-                            <div key={product.id} className="group relative bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition">
-                                <div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
-                                    <img
-                                        src={product.image_url || 'https://via.placeholder.com/300'}
-                                        alt={product.name}
-                                        className="w-full h-full object-center object-cover lg:w-full lg:h-full"
-                                    />
-                                </div>
-                                <div className="mt-4 flex justify-between p-4">
-                                    <div>
-                                        <h3 className="text-sm text-gray-700">
-                                            <Link to={`/products/${product.id}`}>
-                                                <span aria-hidden="true" className="absolute inset-0" />
-                                                {product.name}
-                                            </Link>
-                                        </h3>
-                                        <p className="mt-1 text-sm text-gray-500">{product.category}</p>
+                            <div key={product.id} className="group relative bg-white border border-gray-100 rounded-2xl p-5 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                                <Link to={`/products/${product.id}`} className="block flex-grow">
+                                    <div className="w-full h-56 sm:h-64 bg-gray-50 rounded-xl overflow-hidden relative">
+                                        <img
+                                            src={product.image_url || 'https://via.placeholder.com/300?text=No+Image'}
+                                            alt={product.name}
+                                            className="w-full h-full object-center object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-gray-800 shadow-sm">
+                                            {product.category || 'General'}
+                                        </div>
                                     </div>
-                                    <p className="text-sm font-medium text-gray-900">₹{product.price}</p>
-                                </div>
+                                    <div className="mt-5 flex justify-between items-start">
+                                        <div className="pr-4">
+                                            <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                                                {product.name}
+                                            </h3>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                                                ₹{product.price}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <p className="mt-2 text-sm text-gray-500 line-clamp-2 leading-relaxed">{product.description}</p>
+                                </Link>
+                                <button
+                                    onClick={(e) => { e.preventDefault(); addToCart(product); }}
+                                    className="mt-6 w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 active:scale-95 transition-all duration-200 font-semibold"
+                                >
+                                    Add to Cart
+                                </button>
                             </div>
                         ))}
                         {featuredProducts.length === 0 && (
