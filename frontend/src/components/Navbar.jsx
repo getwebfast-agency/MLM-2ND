@@ -45,7 +45,13 @@ const Navbar = () => {
 
                             {user && <Link to="/orders" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">My Orders</Link>}
                             {user && <Link to="/team" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">My Team</Link>}
-                            {user && <Link to="/withdrawals" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">Withdrawals</Link>}
+                            {user && (
+                                user.role === 'admin' ? (
+                                    <Link to="/admin/withdrawals" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">Withdrawals</Link>
+                                ) : (
+                                    <Link to="/withdrawals" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap">Withdrawals</Link>
+                                )
+                            )}
 
                             {user && (
                                 user.role === 'admin' ? (
@@ -115,7 +121,11 @@ const Navbar = () => {
                             <>
                                 <Link to="/orders" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">My Orders</Link>
                                 <Link to="/team" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">My Team</Link>
-                                <Link to="/withdrawals" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Withdrawals</Link>
+                                {user.role === 'admin' ? (
+                                    <Link to="/admin/withdrawals" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Withdrawals</Link>
+                                ) : (
+                                    <Link to="/withdrawals" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Withdrawals</Link>
+                                )}
                                 {user.role === 'admin' ? (
                                     <Link to="/admin" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Admin Board</Link>
                                 ) : (

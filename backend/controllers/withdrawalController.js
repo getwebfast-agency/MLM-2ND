@@ -57,7 +57,7 @@ exports.getMyWithdrawals = async (req, res) => {
         const withdrawnSum = await Withdrawal.sum('amount', {
             where: {
                 user_id: userId,
-                status: { [Op.in]: ['pending', 'approved'] }
+                status: 'approved' // Only deduct approved withdrawals visually
             }
         });
         const totalWithdrawn = withdrawnSum || 0;
