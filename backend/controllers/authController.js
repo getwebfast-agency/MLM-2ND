@@ -7,7 +7,7 @@ const ReferralClosure = require('../models/ReferralClosure');
 exports.register = async (req, res) => {
     const t = await sequelize.transaction();
     try {
-        const { name, contact, password, referral_code } = req.body;
+        const { name, email, password, referral_code } = req.body;
 
         // Validate sponsor
         const sponsor = await User.findOne({ where: { referral_code } });
@@ -30,30 +30,26 @@ exports.register = async (req, res) => {
             }
         }
 
-        if (!contact) {
+        if (!email) {
             await t.rollback();
-            return res.status(400).json({ message: 'Contact is required' });
+            return res.status(400).json({ message: 'Email is required' });
         }
-        const contactStr = String(contact);
-        const isEmail = contactStr.includes('@');
-        const email = isEmail ? contactStr : null;
-        const phone = !isEmail ? contactStr : null;
 
         // Check if user already exists
         const existingContact = await User.findOne({
-            where: isEmail ? { email } : { phone }
+            where: { email }
         });
 
         if (existingContact) {
             await t.rollback();
-            return res.status(400).json({ message: `${isEmail ? 'Email' : 'Phone'} is already registered` });
+            return res.status(400).json({ message: 'Email is already registered' });
         }
 
         // Create User
         const newUser = await User.create({
             name,
             email,
-            phone,
+            phone: null,
             password_hash: hashedPassword,
             referral_code: newReferralCode,
             sponsor_id: sponsor.id,
@@ -105,16 +101,13 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-        const { contact, email, password } = req.body;
-        const loginContact = contact || email; // fallback
-        if (!loginContact) {
-            return res.status(400).json({ message: 'Contact is required' });
+        const { email, password } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' });
         }
-        const loginContactStr = String(loginContact);
-        const isEmail = loginContactStr.includes('@');
 
         const user = await User.findOne({
-            where: isEmail ? { email: loginContactStr } : { phone: loginContactStr }
+            where: { email }
         });
 
         if (!user) {

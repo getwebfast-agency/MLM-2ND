@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import API_URL from '../config';
 
 const Login = () => {
-    const [contact, setContact] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const { login } = useAuth();
@@ -14,7 +14,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${API_URL}/auth/login`, { contact, password });
+            const response = await axios.post(`${API_URL}/auth/login`, { email, password });
             login(response.data.user, response.data.token);
             if (response.data.user.role === 'admin') {
                 navigate('/admin');
@@ -37,12 +37,12 @@ const Login = () => {
                     <div className="rounded-md shadow-sm -space-y-px">
                         <div>
                             <input
-                                type="text"
+                                type="email"
                                 required
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Email or Phone Number"
-                                value={contact}
-                                onChange={(e) => setContact(e.target.value)}
+                                placeholder="Email Address"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
                         <div>
