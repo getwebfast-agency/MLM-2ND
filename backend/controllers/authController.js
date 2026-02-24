@@ -30,9 +30,14 @@ exports.register = async (req, res) => {
             }
         }
 
-        const isEmail = contact.includes('@');
-        const email = isEmail ? contact : null;
-        const phone = !isEmail ? contact : null;
+        if (!contact) {
+            await t.rollback();
+            return res.status(400).json({ message: 'Contact is required' });
+        }
+        const contactStr = String(contact);
+        const isEmail = contactStr.includes('@');
+        const email = isEmail ? contactStr : null;
+        const phone = !isEmail ? contactStr : null;
 
         // Check if user already exists
         const existingContact = await User.findOne({
@@ -99,10 +104,14 @@ exports.login = async (req, res) => {
     try {
         const { contact, email, password } = req.body;
         const loginContact = contact || email; // fallback
-        const isEmail = loginContact.includes('@');
+        if (!loginContact) {
+            return res.status(400).json({ message: 'Contact is required' });
+        }
+        const loginContactStr = String(loginContact);
+        const isEmail = loginContactStr.includes('@');
 
         const user = await User.findOne({
-            where: isEmail ? { email: loginContact } : { phone: loginContact }
+            where: isEmail ? { email: loginContactStr } : { phone: loginContactStr }
         });
 
         if (!user) {
