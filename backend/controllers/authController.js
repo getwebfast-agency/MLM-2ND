@@ -96,6 +96,9 @@ exports.register = async (req, res) => {
 
     } catch (error) {
         await t.rollback();
+        if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+            return res.status(400).json({ message: error.errors.map(e => e.message).join(', ') });
+        }
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
