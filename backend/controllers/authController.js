@@ -12,6 +12,7 @@ exports.register = async (req, res) => {
         // Validate sponsor
         const sponsor = await User.findOne({ where: { referral_code } });
         if (!sponsor) {
+            await t.rollback();
             return res.status(400).json({ message: 'Invalid referral code' });
         }
 
@@ -33,6 +34,16 @@ exports.register = async (req, res) => {
         const email = isEmail ? contact : null;
         const phone = !isEmail ? contact : null;
 
+        // Check if user already exists
+        const existingContact = await User.findOne({
+            where: isEmail ? { email } : { phone }
+        });
+
+        if (existingContact) {
+            await t.rollback();
+            return res.status(400).json({ message: `${isEmail ? 'Email' : 'Phone'} is already registered` });
+        }
+
         // Create User
         const newUser = await User.create({
             name,
@@ -42,6 +53,7 @@ exports.register = async (req, res) => {
             referral_code: newReferralCode,
             sponsor_id: sponsor.id,
         }, { transaction: t });
+
 
         // Update Closure Table
         // 1. Get all ancestors of the sponsor

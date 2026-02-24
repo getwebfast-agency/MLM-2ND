@@ -16,7 +16,11 @@ const User = sequelize.define('User', {
         allowNull: true,
         unique: true,
         validate: {
-            isEmail: true,
+            isEmailOrNull(value) {
+                if (value !== null && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                    throw new Error('Must be a valid email string');
+                }
+            }
         },
     },
     phone: {
