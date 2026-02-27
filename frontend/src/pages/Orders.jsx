@@ -5,7 +5,7 @@ import API_URL from '../config';
 
 const statusConfig = {
     pending: {
-        label: 'Pending',
+        label: 'Order Confirmation Pending',
         cls: 'bg-yellow-100 text-yellow-800',
         icon: <Clock className="w-3.5 h-3.5 mr-1" />,
     },
