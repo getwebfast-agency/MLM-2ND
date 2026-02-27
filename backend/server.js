@@ -30,7 +30,7 @@ const startServer = async () => {
         console.log('Database connected successfully.');
         // Sync models (force: false to avoid dropping tables)
         // In production, use migrations instead of sync
-        await sequelize.sync({ force: false });
+        await sequelize.sync({ alter: true });
 
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);

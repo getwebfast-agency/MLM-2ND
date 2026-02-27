@@ -20,8 +20,11 @@ const Order = sequelize.define('Order', {
         allowNull: false,
     },
     status: {
-        type: DataTypes.ENUM('pending', 'delivery_pending', 'completed', 'cancelled'),
+        type: DataTypes.STRING,
         defaultValue: 'pending',
+        validate: {
+            isIn: [['pending', 'delivery_pending', 'completed', 'cancelled']]
+        }
     },
     referral_code: {
         type: DataTypes.STRING,

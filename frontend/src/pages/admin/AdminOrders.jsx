@@ -32,7 +32,7 @@ const AdminOrders = () => {
     }, [filterStatus]);
 
     const handleConfirmOrder = async (orderId) => {
-        if (!window.confirm('Are you sure you want to confirm this order? Commissions will be distributed.')) return;
+        if (!window.confirm('Confirm this order? The status will move to "Delivery Pending" and the member will be asked to accept delivery before commissions are distributed.')) return;
 
         try {
             const config = { headers: { Authorization: `Bearer ${token}` } };
