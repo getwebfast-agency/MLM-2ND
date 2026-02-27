@@ -35,7 +35,7 @@ const Privacy = () => {
 
                     <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">6. Contact Us</h2>
                     <p className="mb-4">
-                        If you have any questions about this Privacy Policy, please contact us at Marath******@gmail.com.
+                        If you have any questions about this Privacy Policy, please contact us at Marathamall1@gmail.com.
                     </p>
                 </div>
             </div>
