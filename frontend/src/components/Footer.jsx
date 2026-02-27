@@ -7,7 +7,7 @@ const Footer = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
                     <div>
-                        <h3 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent mb-4">Marathamall</h3>
+                        <h3 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent mb-4">Maratha Mall</h3>
                         <p className="text-gray-400 text-sm">Empowering your future through our premium network and quality products.</p>
                     </div>
                     <div>
@@ -43,7 +43,7 @@ const Footer = () => {
                     </div>
                 </div>
                 <div className="border-t border-gray-700 pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
-                    <p className="text-sm text-gray-500 mb-4 md:mb-0">&copy; {new Date().getFullYear()} Marathamall. All rights reserved.</p>
+                    <p className="text-sm text-gray-500 mb-4 md:mb-0">&copy; {new Date().getFullYear()} Maratha Mall. All rights reserved.</p>
                     <div className="flex space-x-6">
                         <Link to="/admin" className="text-gray-500 hover:text-white text-sm">Admin Access</Link>
                     </div>

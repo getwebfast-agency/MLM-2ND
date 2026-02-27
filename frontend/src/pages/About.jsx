@@ -15,7 +15,7 @@ const About = () => {
                     <div className="absolute inset-0 bg-indigo-900 mix-blend-multiply" />
                 </div>
                 <div className="relative max-w-7xl mx-auto text-center">
-                    <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">About Marathamall</h1>
+                    <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">About Maratha Mall</h1>
                     <p className="mt-6 text-xl max-w-3xl mx-auto text-indigo-100">
                         Empowering individuals to achieve financial freedom through a robust network and premium products.
                     </p>
@@ -30,7 +30,7 @@ const About = () => {
                         Transforming Lives, One Connection at a Time
                     </p>
                     <p className="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
-                        At Marathamall, we believe in the power of community. Our mission is to provide a platform where anyone can build a sustainable business, access high-quality products, and grow personally and professionally.
+                        At Maratha Mall, we believe in the power of community. Our mission is to provide a platform where anyone can build a sustainable business, access high-quality products, and grow personally and professionally.
                     </p>
                 </div>
 
@@ -68,7 +68,7 @@ const About = () => {
                                 Built for the Future
                             </h2>
                             <p className="mt-3 max-w-3xl text-lg text-gray-500">
-                                Marathamall started with a simple vision: to bridge the gap between quality manufacturers and ambitious entrepreneurs. Today, we are a thriving ecosystem connecting thousands of members across the region.
+                                Maratha Mall started with a simple vision: to bridge the gap between quality manufacturers and ambitious entrepreneurs. Today, we are a thriving ecosystem connecting thousands of members across the region.
                             </p>
                             <div className="mt-8 grid grid-cols-2 gap-0.5 md:grid-cols-3 lg:mt-0 lg:grid-cols-2">
                                 <div className="col-span-1 flex justify-center py-8 px-8 bg-gray-50">
@@ -113,7 +113,7 @@ const About = () => {
                 <div className="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
                     <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
                         <span className="block">Ready to simplify your journey?</span>
-                        <span className="block">Join Marathamall today.</span>
+                        <span className="block">Join Maratha Mall today.</span>
                     </h2>
                     <p className="mt-4 text-lg leading-6 text-indigo-200">
                         Start your path to success with a proven system and a team that cares about your growth.

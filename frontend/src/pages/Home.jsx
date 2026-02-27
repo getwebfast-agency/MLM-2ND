@@ -42,7 +42,7 @@ const Home = () => {
                             <div className="sm:text-center lg:text-left">
                                 <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
                                     <span className="block xl:inline">Unlock Your Potential with</span>{' '}
-                                    <span className="block text-indigo-600 xl:inline">Marathamall</span>
+                                    <span className="block text-indigo-600 xl:inline">Maratha Mall</span>
                                 </h1>
                                 <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
                                     Join a community of ambitious individuals. Build your network, earn rewards, and access premium products designed for success.
@@ -229,7 +229,7 @@ const Home = () => {
                             <div className="flex mb-4 text-yellow-400">
                                 <Star fill="currentColor" size={20} /><Star fill="currentColor" size={20} /><Star fill="currentColor" size={20} /><Star fill="currentColor" size={20} /><Star fill="currentColor" size={20} />
                             </div>
-                            <p className="mb-4">"Marathamall has completely changed my financial trajectory. The support system is incredible!"</p>
+                            <p className="mb-4">"Maratha Mall has completely changed my financial trajectory. The support system is incredible!"</p>
                             <p className="font-bold">- Sarah Johnson</p>
                         </div>
                         <div className="bg-indigo-700 p-6 rounded-lg text-white">

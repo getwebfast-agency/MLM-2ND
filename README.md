@@ -1,4 +1,4 @@
-# Marathamall - MLM Platform
+# Maratha Mall - MLM Platform
 
 A complete, full-stack MLM platform built with **Node.js, Express, PostgreSQL** (Backend) and **React, TailwindCSS** (Frontend).
 

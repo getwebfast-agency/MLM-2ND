@@ -10,7 +10,7 @@ const Terms = () => {
 
                     <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">1. Acceptance of Terms</h2>
                     <p className="mb-4">
-                        By accessing and using Marathamall ("the Platform"), you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use our platform.
+                        By accessing and using Maratha Mall ("the Platform"), you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use our platform.
                     </p>
 
                     <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">2. User Responsibilities</h2>
@@ -25,7 +25,7 @@ const Terms = () => {
 
                     <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">4. Intellectual Property</h2>
                     <p className="mb-4">
-                        The Service and its original content, features, and functionality are and will remain the exclusive property of Marathamall and its licensors. The Service is protected by copyright, trademark, and other laws.
+                        The Service and its original content, features, and functionality are and will remain the exclusive property of Maratha Mall and its licensors. The Service is protected by copyright, trademark, and other laws.
                     </p>
 
                     <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">5. Termination</h2>

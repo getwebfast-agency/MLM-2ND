@@ -23,7 +23,7 @@ const Navbar = () => {
                     <div className="flex items-center">
                         <Link to="/" className="flex-shrink-0 flex items-center">
                             <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                                Marathamall
+                                Maratha Mall
                             </span>
                         </Link>
                     </div>
