@@ -322,50 +322,40 @@ const Cart = () => {
                             </div>
                         </div>
 
-                        <div className="mt-6">
+                        {/* COD Info Badge */}
+                        <div className="mt-6 border-t border-gray-200 pt-5">
+                            <div className="flex items-center gap-3 bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-3">
+                                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                                </span>
+                                <span className="text-sm text-indigo-700 font-medium">Cash on Delivery — Pay when your product arrives</span>
+                            </div>
+                        </div>
+
+                        <div className="mt-4">
                             <button
                                 type="button"
                                 onClick={async () => {
                                     try {
                                         const token = localStorage.getItem('token');
-                                        if (!token) {
-                                            window.location.href = '/login';
-                                            return;
-                                        }
-
+                                        if (!token) { window.location.href = '/login'; return; }
                                         if (!shippingDetails.name || !shippingDetails.phone || !shippingDetails.address) {
-                                            alert("Please fill in all shipping details.");
+                                            alert('Please fill in all shipping details.');
                                             return;
                                         }
-
                                         const config = { headers: { Authorization: `Bearer ${token}` } };
-
-                                        // Prepare items for API
-                                        const items = cart.map(item => ({
-                                            productId: item.id,
-                                            quantity: item.quantity
-                                        }));
-
-                                        // Create pending order
+                                        const items = cart.map(item => ({ productId: item.id, quantity: item.quantity }));
                                         const res = await axios.post(`${API_URL}/shop/orders`, {
                                             items,
                                             referralCode: isApplied ? referralCode : null
                                         }, config);
-
                                         const orderId = res.data.orderId;
-
-                                        // WhatsApp Message
                                         const itemsList = cart.map(item => `- ${item.name} (x${item.quantity})`).join('\n');
                                         let message = `Hello, I want to confirm my order #${orderId}.\n\n*Items:*\n${itemsList}\n\n*Total:* ₹${finalTotal.toFixed(2)}\n\n*Shipping Details:*\nName: ${shippingDetails.name}\nPhone: ${shippingDetails.phone}\nAddress: ${shippingDetails.address}`;
-
-                                        if (isApplied && referralCode) {
-                                            message += `\n\n*Referral Code:* ${referralCode}`;
-                                        }
-
+                                        if (isApplied && referralCode) message += `\n\n*Referral Code:* ${referralCode}`;
                                         const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
                                         window.open(whatsappUrl, '_blank');
-
-                                        clearCart(); // Clear cart after successful order initiation
+                                        clearCart();
                                     } catch (error) {
                                         console.error('Order failed:', error);
                                         alert('Failed to create order. Please try again.');
