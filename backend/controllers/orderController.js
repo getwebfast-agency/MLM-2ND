@@ -96,74 +96,79 @@ exports.confirmOrder = async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        if (order.status === 'completed') {
+        if (order.status !== 'pending') {
             await t.rollback();
-            return res.status(400).json({ message: 'Order already completed' });
+            return res.status(400).json({ message: 'Only pending orders can be confirmed' });
         }
 
-        // 1. Update Status to delivery_pending (waiting for member to accept)
+        // Set to delivery_pending — commissions distributed ONLY when member accepts delivery
         order.status = 'delivery_pending';
         await order.save({ transaction: t });
 
-        // 2. Distribute Commissions
-        // Determine the starting point for commission distribution
-        // If referral_code was used, commissions go to that referrer and their upline.
-        // If NO referral_code, commissions go to the buyer's sponsor and their upline.
+        await t.commit();
+        res.json({ message: 'Order confirmed. Moved to Delivery Pending — awaiting member acceptance.', order });
 
+    } catch (error) {
+        await t.rollback();
+        console.error('Confirm Order Error:', error);
+        res.status(500).json({ message: 'Order confirmation failed', error: error.message });
+    }
+};
+
+exports.acceptDelivery = async (req, res) => {
+    const t = await sequelize.transaction();
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const order = await Order.findByPk(id, { include: [OrderItem] });
+
+        if (!order) return res.status(404).json({ message: 'Order not found' });
+        if (order.user_id !== userId) return res.status(403).json({ message: 'Not your order' });
+        if (order.status !== 'delivery_pending') {
+            return res.status(400).json({ message: 'Order is not awaiting delivery acceptance' });
+        }
+
+        // 1. Mark as completed
+        order.status = 'completed';
+        await order.save({ transaction: t });
+
+        // 2. Distribute Commissions (only happens NOW when member accepts delivery)
         let commissionReceiverId;
 
         if (order.referral_code) {
             const referrer = await User.findOne({ where: { referral_code: order.referral_code } });
-            if (referrer) {
-                commissionReceiverId = referrer.id;
-                // Also, we might want to give a direct commission to this referrer?
-                // For MLM structure simplicity in this project:
-                // The referrer is considered Level 1.
-            }
+            if (referrer) commissionReceiverId = referrer.id;
         }
 
-        // Fallback: use buyer's sponsor if no valid referral code
+        // Fallback: use buyer's sponsor
         if (!commissionReceiverId) {
             const buyer = await User.findByPk(order.user_id);
-            commissionReceiverId = buyer.sponsor_id;
+            commissionReceiverId = buyer ? buyer.sponsor_id : null;
         }
 
         if (commissionReceiverId) {
-            // We need to trace up from commissionReceiverId
-            // The commissionReceiverId IS the Level 1 benficiary.
-
-            // Get ancestors of the "Start Node"
             const ancestors = await ReferralClosure.findAll({
                 where: {
                     descendant_id: commissionReceiverId,
                     depth: { [Op.between]: [0, 4] }
                 },
-                include: [
-                    { model: User, as: 'ancestor', attributes: ['id', 'role'] }
-                ],
+                include: [{ model: User, as: 'ancestor', attributes: ['id', 'role'] }],
                 transaction: t
             });
 
             const commissions = [];
             for (const relation of ancestors) {
-                // SKIP ADMIN COMMISSIONS
-                if (relation.ancestor && relation.ancestor.role === 'admin') {
-                    continue;
-                }
-
-                // relation.depth 0 => Level 1
-                // relation.depth 1 => Level 2
+                if (relation.ancestor && relation.ancestor.role === 'admin') continue;
                 const level = relation.depth + 1;
                 const rate = COMMISSION_RATES[level];
-
                 if (rate) {
-                    const commissionAmount = order.total_amount * rate;
                     commissions.push({
                         user_id: relation.ancestor_id,
                         source_user_id: order.user_id,
                         order_id: order.id,
-                        amount: commissionAmount,
-                        level: level,
+                        amount: order.total_amount * rate,
+                        level,
                         status: 'paid'
                     });
                 }
@@ -174,33 +179,9 @@ exports.confirmOrder = async (req, res) => {
         }
 
         await t.commit();
-        res.json({ message: 'Order confirmed. Status set to Delivery Pending — awaiting member acceptance.', order });
-
+        res.json({ message: 'Delivery accepted. Order completed and commissions distributed.', order });
     } catch (error) {
         await t.rollback();
-        console.error('Confirm Order Error:', error);
-        res.status(500).json({ message: 'Order confirmation failed', error: error.message });
-    }
-};
-
-exports.acceptDelivery = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const userId = req.user.id;
-
-        const order = await Order.findByPk(id);
-
-        if (!order) return res.status(404).json({ message: 'Order not found' });
-        if (order.user_id !== userId) return res.status(403).json({ message: 'Not your order' });
-        if (order.status !== 'delivery_pending') {
-            return res.status(400).json({ message: 'Order is not in delivery_pending state' });
-        }
-
-        order.status = 'completed';
-        await order.save();
-
-        res.json({ message: 'Delivery accepted. Order marked as completed.', order });
-    } catch (error) {
         console.error('Accept Delivery Error:', error);
         res.status(500).json({ message: 'Failed to accept delivery', error: error.message });
     }
