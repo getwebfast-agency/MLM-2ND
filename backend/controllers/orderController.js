@@ -101,8 +101,8 @@ exports.confirmOrder = async (req, res) => {
             return res.status(400).json({ message: 'Order already completed' });
         }
 
-        // 1. Update Status
-        order.status = 'completed';
+        // 1. Update Status to delivery_pending (waiting for member to accept)
+        order.status = 'delivery_pending';
         await order.save({ transaction: t });
 
         // 2. Distribute Commissions
@@ -174,12 +174,35 @@ exports.confirmOrder = async (req, res) => {
         }
 
         await t.commit();
-        res.json({ message: 'Order confirmed and commissions distributed', order });
+        res.json({ message: 'Order confirmed. Status set to Delivery Pending — awaiting member acceptance.', order });
 
     } catch (error) {
         await t.rollback();
         console.error('Confirm Order Error:', error);
         res.status(500).json({ message: 'Order confirmation failed', error: error.message });
+    }
+};
+
+exports.acceptDelivery = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const order = await Order.findByPk(id);
+
+        if (!order) return res.status(404).json({ message: 'Order not found' });
+        if (order.user_id !== userId) return res.status(403).json({ message: 'Not your order' });
+        if (order.status !== 'delivery_pending') {
+            return res.status(400).json({ message: 'Order is not in delivery_pending state' });
+        }
+
+        order.status = 'completed';
+        await order.save();
+
+        res.json({ message: 'Delivery accepted. Order marked as completed.', order });
+    } catch (error) {
+        console.error('Accept Delivery Error:', error);
+        res.status(500).json({ message: 'Failed to accept delivery', error: error.message });
     }
 };
 

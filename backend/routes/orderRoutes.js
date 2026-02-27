@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/authMiddleware');
-const { createOrder, getMyOrders, getMyEarnings } = require('../controllers/orderController');
+const { createOrder, getMyOrders, getMyEarnings, acceptDelivery } = require('../controllers/orderController');
 
 router.use(authenticateToken);
 
@@ -9,6 +9,7 @@ router.post('/orders', createOrder);
 router.get('/orders', getMyOrders);
 router.put('/orders/:id/confirm', require('../controllers/orderController').confirmOrder);
 router.put('/orders/:id/cancel', require('../controllers/orderController').cancelOrder);
+router.put('/orders/:id/accept-delivery', acceptDelivery);
 router.get('/team-orders', require('../controllers/orderController').getDownlineOrders);
 router.get('/commissions', getMyEarnings); // Could be separate route file but grouping for simplicity
 

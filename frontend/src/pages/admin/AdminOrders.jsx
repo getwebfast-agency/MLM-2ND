@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import API_URL from '../../config';
-import { CheckCircle, XCircle, Loader, Filter } from 'lucide-react';
+import { CheckCircle, XCircle, Loader, Filter, Truck } from 'lucide-react';
 
 const AdminOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -71,6 +71,7 @@ const AdminOrders = () => {
                         className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                     >
                         <option value="pending">Pending</option>
+                        <option value="delivery_pending">Delivery Pending</option>
                         <option value="completed">Completed</option>
                         <option value="all">All Orders</option>
                     </select>
@@ -95,8 +96,16 @@ const AdminOrders = () => {
                                                 <p className="text-sm font-medium text-indigo-600 truncate">
                                                     Order #{order.id.slice(0, 8)}...
                                                 </p>
-                                                <span className={`ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                                                    {order.status}
+                                                <span className={`ml-2 px-2.5 py-0.5 inline-flex items-center text-xs leading-5 font-semibold rounded-full 
+                                                    ${order.status === 'completed' ? 'bg-green-100 text-green-800'
+                                                        : order.status === 'delivery_pending' ? 'bg-blue-100 text-blue-800'
+                                                            : order.status === 'cancelled' ? 'bg-red-100 text-red-800'
+                                                                : 'bg-yellow-100 text-yellow-800'}`}>
+                                                    {order.status === 'delivery_pending' && <Truck className="w-3 h-3 mr-1" />}
+                                                    {order.status === 'delivery_pending' ? 'Delivery Pending'
+                                                        : order.status === 'completed' ? 'Completed'
+                                                            : order.status === 'cancelled' ? 'Cancelled'
+                                                                : 'Pending'}
                                                 </span>
                                             </div>
                                             <p className="mt-1 text-sm text-gray-500">
@@ -131,6 +140,12 @@ const AdminOrders = () => {
                                                         Confirm
                                                     </button>
                                                 </div>
+                                            )}
+                                            {order.status === 'delivery_pending' && (
+                                                <span className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                                                    <Truck className="w-3 h-3" />
+                                                    Awaiting Member Acceptance
+                                                </span>
                                             )}
                                         </div>
                                     </div>
