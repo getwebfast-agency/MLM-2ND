@@ -1,20 +1,8 @@
 const { Order, OrderItem, Product, Commission, User, ReferralClosure, sequelize } = require('../models');
 const { Op } = require('sequelize');
 
-// Commission rates for the 10 levels ABOVE the buyer in the referral tree
-// depth 1 = direct sponsor (Level 1), depth 2 = Level 2 ... depth 10 = Level 10
-const COMMISSION_RATES = {
-    1: 0.05,   // 5%  — Level 1 (direct sponsor)
-    2: 0.03,   // 3%  — Level 2
-    3: 0.02,   // 2%  — Level 3
-    4: 0.01,   // 1%  — Level 4
-    5: 0.01,   // 1%  — Level 5
-    6: 0.005,  // 0.5% — Level 6
-    7: 0.005,  // 0.5% — Level 7
-    8: 0.005,  // 0.5% — Level 8
-    9: 0.005,  // 0.5% — Level 9
-    10: 0.005  // 0.5% — Level 10
-};
+// Default commission rate per upline member when a product has no commission set
+const DEFAULT_COMMISSION_RATE = 0.002; // 0.2%
 
 exports.createOrder = async (req, res) => {
     const t = await sequelize.transaction();
@@ -122,7 +110,10 @@ exports.acceptDelivery = async (req, res) => {
         const { id } = req.params;
         const userId = req.user.id;
 
-        const order = await Order.findByPk(id, { include: [OrderItem] });
+        // Load order with items + each item's product (for commission %)
+        const order = await Order.findByPk(id, {
+            include: [{ model: OrderItem, include: [Product] }]
+        });
 
         if (!order) return res.status(404).json({ message: 'Order not found' });
         if (order.user_id !== userId) return res.status(403).json({ message: 'Not your order' });
@@ -134,13 +125,25 @@ exports.acceptDelivery = async (req, res) => {
         order.status = 'completed';
         await order.save({ transaction: t });
 
-        // 2. Distribute commissions to the 10 members DIRECTLY ABOVE the buyer in the tree
-        //    We query ReferralClosure WHERE descendant_id = buyer AND depth 1..10
-        //    depth 1 = direct sponsor (Level 1), depth 2 = Level 2, ..., depth 10 = Level 10
-        //    Admin users are skipped.
+        // 2. Calculate the flat commission rate for this order:
+        //    - Use the FIRST item's product member_commission_percent (if > 0)
+        //    - OR use DEFAULT_COMMISSION_RATE (0.2%) if not set
+        //    All 10 upline members receive the SAME rate on the total order amount.
+        let commissionRate = DEFAULT_COMMISSION_RATE;
+        if (order.OrderItems && order.OrderItems.length > 0) {
+            const firstProduct = order.OrderItems[0].Product;
+            if (firstProduct && parseFloat(firstProduct.member_commission_percent) > 0) {
+                // Convert percent (e.g. 5%) to decimal (0.05)
+                commissionRate = parseFloat(firstProduct.member_commission_percent) / 100;
+            }
+        }
+
+        const commissionAmountPerMember = parseFloat(order.total_amount) * commissionRate;
+
+        // 3. Find the 10 members DIRECTLY ABOVE the buyer in the tree (skip admin)
         const ancestors = await ReferralClosure.findAll({
             where: {
-                descendant_id: order.user_id,   // start from the BUYER
+                descendant_id: order.user_id,    // start from the BUYER
                 depth: { [Op.between]: [1, 10] } // levels 1 through 10
             },
             include: [{ model: User, as: 'ancestor', attributes: ['id', 'role'] }],
@@ -149,21 +152,15 @@ exports.acceptDelivery = async (req, res) => {
 
         const commissions = [];
         for (const relation of ancestors) {
-            // Skip admin accounts — they never receive commissions
             if (relation.ancestor && relation.ancestor.role === 'admin') continue;
-
-            const level = relation.depth; // depth 1 = Level 1, depth 2 = Level 2, etc.
-            const rate = COMMISSION_RATES[level];
-            if (rate) {
-                commissions.push({
-                    user_id: relation.ancestor_id,
-                    source_user_id: order.user_id,
-                    order_id: order.id,
-                    amount: parseFloat(order.total_amount) * rate,
-                    level,
-                    status: 'paid'
-                });
-            }
+            commissions.push({
+                user_id: relation.ancestor_id,
+                source_user_id: order.user_id,
+                order_id: order.id,
+                amount: commissionAmountPerMember,  // same for ALL 10 members
+                level: relation.depth,
+                status: 'paid'
+            });
         }
 
         if (commissions.length > 0) {
@@ -172,8 +169,10 @@ exports.acceptDelivery = async (req, res) => {
 
         await t.commit();
         res.json({
-            message: `Delivery accepted. Order completed. Commissions distributed to ${commissions.length} upline member(s).`,
+            message: `Delivery accepted. Order completed. ₹${commissionAmountPerMember.toFixed(2)} commission distributed to ${commissions.length} upline member(s) (rate: ${(commissionRate * 100).toFixed(2)}%).`,
             order,
+            commissionRate: commissionRate * 100,
+            commissionPerMember: commissionAmountPerMember,
             commissionsDistributed: commissions.length
         });
     } catch (error) {
