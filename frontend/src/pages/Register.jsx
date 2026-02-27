@@ -5,7 +5,7 @@ import API_URL from '../config';
 
 const Register = () => {
     const [searchParams] = useSearchParams();
-    const refCode = searchParams.get('ref') || '';
+    const refCode = searchParams.get('ref') || 'JOINSM';
 
     const [formData, setFormData] = useState({
         name: '',
@@ -17,11 +17,9 @@ const Register = () => {
     const [successMsg, setSuccessMsg] = useState('');
     const navigate = useNavigate();
 
-    // Auto-fill referral code if link changes
+    // Auto-fill referral code: URL param takes priority, otherwise default to JOINSM
     useEffect(() => {
-        if (refCode) {
-            setFormData(prev => ({ ...prev, referral_code: refCode }));
-        }
+        setFormData(prev => ({ ...prev, referral_code: refCode }));
     }, [refCode]);
 
     const handleChange = (e) => {
