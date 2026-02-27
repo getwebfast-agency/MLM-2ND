@@ -1,18 +1,19 @@
 const { Order, OrderItem, Product, Commission, User, ReferralClosure, sequelize } = require('../models');
 const { Op } = require('sequelize');
 
-// Commission Configuration
-// Level 1 (Direct Sponsor): 10%
-// Level 2: 5%
-// Level 3: 3%
-// Level 4: 2%
-// Level 5: 1%
+// Commission rates for the 10 levels ABOVE the buyer in the referral tree
+// depth 1 = direct sponsor (Level 1), depth 2 = Level 2 ... depth 10 = Level 10
 const COMMISSION_RATES = {
-    1: 0.002, // 0.2%
-    2: 0.05,
-    3: 0.03,
-    4: 0.02,
-    5: 0.01
+    1: 0.05,   // 5%  — Level 1 (direct sponsor)
+    2: 0.03,   // 3%  — Level 2
+    3: 0.02,   // 2%  — Level 3
+    4: 0.01,   // 1%  — Level 4
+    5: 0.01,   // 1%  — Level 5
+    6: 0.005,  // 0.5% — Level 6
+    7: 0.005,  // 0.5% — Level 7
+    8: 0.005,  // 0.5% — Level 8
+    9: 0.005,  // 0.5% — Level 9
+    10: 0.005  // 0.5% — Level 10
 };
 
 exports.createOrder = async (req, res) => {
@@ -129,57 +130,52 @@ exports.acceptDelivery = async (req, res) => {
             return res.status(400).json({ message: 'Order is not awaiting delivery acceptance' });
         }
 
-        // 1. Mark as completed
+        // 1. Mark order as completed
         order.status = 'completed';
         await order.save({ transaction: t });
 
-        // 2. Distribute Commissions (only happens NOW when member accepts delivery)
-        let commissionReceiverId;
+        // 2. Distribute commissions to the 10 members DIRECTLY ABOVE the buyer in the tree
+        //    We query ReferralClosure WHERE descendant_id = buyer AND depth 1..10
+        //    depth 1 = direct sponsor (Level 1), depth 2 = Level 2, ..., depth 10 = Level 10
+        //    Admin users are skipped.
+        const ancestors = await ReferralClosure.findAll({
+            where: {
+                descendant_id: order.user_id,   // start from the BUYER
+                depth: { [Op.between]: [1, 10] } // levels 1 through 10
+            },
+            include: [{ model: User, as: 'ancestor', attributes: ['id', 'role'] }],
+            transaction: t
+        });
 
-        if (order.referral_code) {
-            const referrer = await User.findOne({ where: { referral_code: order.referral_code } });
-            if (referrer) commissionReceiverId = referrer.id;
+        const commissions = [];
+        for (const relation of ancestors) {
+            // Skip admin accounts — they never receive commissions
+            if (relation.ancestor && relation.ancestor.role === 'admin') continue;
+
+            const level = relation.depth; // depth 1 = Level 1, depth 2 = Level 2, etc.
+            const rate = COMMISSION_RATES[level];
+            if (rate) {
+                commissions.push({
+                    user_id: relation.ancestor_id,
+                    source_user_id: order.user_id,
+                    order_id: order.id,
+                    amount: parseFloat(order.total_amount) * rate,
+                    level,
+                    status: 'paid'
+                });
+            }
         }
 
-        // Fallback: use buyer's sponsor
-        if (!commissionReceiverId) {
-            const buyer = await User.findByPk(order.user_id);
-            commissionReceiverId = buyer ? buyer.sponsor_id : null;
-        }
-
-        if (commissionReceiverId) {
-            const ancestors = await ReferralClosure.findAll({
-                where: {
-                    descendant_id: commissionReceiverId,
-                    depth: { [Op.between]: [0, 4] }
-                },
-                include: [{ model: User, as: 'ancestor', attributes: ['id', 'role'] }],
-                transaction: t
-            });
-
-            const commissions = [];
-            for (const relation of ancestors) {
-                if (relation.ancestor && relation.ancestor.role === 'admin') continue;
-                const level = relation.depth + 1;
-                const rate = COMMISSION_RATES[level];
-                if (rate) {
-                    commissions.push({
-                        user_id: relation.ancestor_id,
-                        source_user_id: order.user_id,
-                        order_id: order.id,
-                        amount: order.total_amount * rate,
-                        level,
-                        status: 'paid'
-                    });
-                }
-            }
-            if (commissions.length > 0) {
-                await Commission.bulkCreate(commissions, { transaction: t });
-            }
+        if (commissions.length > 0) {
+            await Commission.bulkCreate(commissions, { transaction: t });
         }
 
         await t.commit();
-        res.json({ message: 'Delivery accepted. Order completed and commissions distributed.', order });
+        res.json({
+            message: `Delivery accepted. Order completed. Commissions distributed to ${commissions.length} upline member(s).`,
+            order,
+            commissionsDistributed: commissions.length
+        });
     } catch (error) {
         await t.rollback();
         console.error('Accept Delivery Error:', error);
