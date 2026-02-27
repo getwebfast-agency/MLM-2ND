@@ -164,6 +164,21 @@ const Orders = () => {
                                                         Your order has been confirmed and is on its way. Once you receive and verify the product, click <strong>"Product Accepted"</strong>.
                                                     </p>
                                                 </div>
+
+                                                {/* 🔴 Important Warning */}
+                                                <div className="mb-4 flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                                                    <span className="flex-shrink-0 text-red-600 text-base leading-snug">🔴</span>
+                                                    <div className="text-sm text-red-800 leading-relaxed">
+                                                        <p className="font-bold mb-1">Important Note:</p>
+                                                        <p>
+                                                            Before clicking <strong>"Product Accepted,"</strong> please carefully check the product.
+                                                            If the product is <strong>damaged, broken, or different</strong> from what you ordered,
+                                                            do <strong>not</strong> accept it.
+                                                            Once the product is accepted, it <strong>cannot be returned or replaced.</strong>
+                                                        </p>
+                                                    </div>
+                                                </div>
+
                                                 <button
                                                     onClick={() => setConfirmModal(order.id)}
                                                     className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-bold rounded-xl hover:from-green-600 hover:to-emerald-700 active:scale-95 transition shadow-sm"
