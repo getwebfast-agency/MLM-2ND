@@ -129,6 +129,33 @@ const ProductDetail = () => {
                             <div>
                                 <h2 className="sr-only">Product information</h2>
                                 <p className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">₹{product.price}</p>
+                                {/* Tax display */}
+                                {(() => {
+                                    const taxField = product.tax || 'included';
+                                    if (taxField === 'included') {
+                                        return (
+                                            <span className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+                                                ✅ Tax Included in Price
+                                            </span>
+                                        );
+                                    } else if (taxField === '18%') {
+                                        const taxAmt = product.price * 0.18;
+                                        return (
+                                            <span className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                                + ₹{taxAmt.toFixed(2)} GST (18%) · Total: ₹{(product.price + taxAmt).toFixed(2)}
+                                            </span>
+                                        );
+                                    } else if (typeof taxField === 'string' && taxField.startsWith('custom:')) {
+                                        const pct = parseFloat(taxField.replace('custom:', '')) || 0;
+                                        const taxAmt = product.price * (pct / 100);
+                                        return (
+                                            <span className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                                + ₹{taxAmt.toFixed(2)} Tax ({pct}%) · Total: ₹{(product.price + taxAmt).toFixed(2)}
+                                            </span>
+                                        );
+                                    }
+                                    return null;
+                                })()}
                             </div>
 
                             {user && (

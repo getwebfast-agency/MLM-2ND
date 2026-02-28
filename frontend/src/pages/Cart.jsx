@@ -50,8 +50,28 @@ const Cart = () => {
         }
     };
 
-    const taxEstimate = (cartTotal - referralDiscount) * 0.18;
-    const finalTotal = (cartTotal - referralDiscount) + taxEstimate;
+    // Compute tax per product based on each product's tax field
+    const computeTax = () => {
+        let tax = 0;
+        for (const item of cart) {
+            const itemTotal = item.price * item.quantity;
+            const taxField = item.tax || 'included';
+            if (taxField === 'included') {
+                // Tax already in price, no extra added
+            } else if (taxField === '18%') {
+                tax += itemTotal * 0.18;
+            } else if (typeof taxField === 'string' && taxField.startsWith('custom:')) {
+                const pct = parseFloat(taxField.replace('custom:', '')) || 0;
+                tax += itemTotal * (pct / 100);
+            }
+        }
+        return tax;
+    };
+
+    const allTaxIncluded = cart.every(item => !item.tax || item.tax === 'included');
+    const taxEstimate = computeTax();
+    const discountedBase = cartTotal - referralDiscount;
+    const finalTotal = discountedBase + taxEstimate;
 
     React.useEffect(() => {
         // Fetch random products for suggestion
@@ -268,8 +288,17 @@ const Cart = () => {
                                 <dd className="text-sm font-medium text-gray-700">₹0.00</dd>
                             </div>
                             <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-                                <dt className="text-sm font-medium text-gray-900">Tax Estimate (18%)</dt>
-                                <dd className="text-sm font-medium text-gray-700">₹{taxEstimate.toFixed(2)}</dd>
+                                {allTaxIncluded ? (
+                                    <>
+                                        <dt className="text-sm font-medium text-green-700">Tax (Included in Price)</dt>
+                                        <dd className="text-sm font-medium text-green-700">₹0.00</dd>
+                                    </>
+                                ) : (
+                                    <>
+                                        <dt className="text-sm font-medium text-gray-900">Tax Estimate</dt>
+                                        <dd className="text-sm font-medium text-gray-700">₹{taxEstimate.toFixed(2)}</dd>
+                                    </>
+                                )}
                             </div>
 
                             <div className="flex items-center justify-between border-t border-gray-200 pt-4">

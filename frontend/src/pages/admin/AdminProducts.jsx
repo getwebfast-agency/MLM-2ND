@@ -14,6 +14,7 @@ const AdminProducts = () => {
         image_url: '',
         original_price: '',
         tax: 'included',
+        customTaxPercent: '',
         shipping_cost: 0,
         shippingOption: 'free',
         referral_discount_percent: 0,
@@ -45,7 +46,10 @@ const AdminProducts = () => {
             formData.append('price', productForm.price);
             formData.append('category', productForm.category);
             formData.append('original_price', productForm.original_price || 0); // Handle optional
-            formData.append('tax', productForm.tax);
+            const taxValue = productForm.tax === 'custom'
+                ? `custom:${productForm.customTaxPercent}`
+                : productForm.tax;
+            formData.append('tax', taxValue);
             formData.append('shipping_cost', productForm.shipping_cost);
             formData.append('referral_discount_percent', productForm.referral_discount_percent);
             formData.append('member_commission_percent', productForm.member_commission_percent);
@@ -77,6 +81,7 @@ const AdminProducts = () => {
                 image: null,
                 original_price: '',
                 tax: 'included',
+                customTaxPercent: '',
                 shipping_cost: 0,
                 shippingOption: 'free',
                 referral_discount_percent: 0,
@@ -150,14 +155,30 @@ const AdminProducts = () => {
                             onChange={e => setProductForm({ ...productForm, original_price: e.target.value })}
                         />
 
-                        <select
-                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-white border"
-                            value={productForm.tax}
-                            onChange={e => setProductForm({ ...productForm, tax: e.target.value })}
-                        >
-                            <option value="included">Tax Included</option>
-                            <option value="18%">Tax 18%</option>
-                        </select>
+                        <div>
+                            <select
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-white border"
+                                value={productForm.tax}
+                                onChange={e => setProductForm({ ...productForm, tax: e.target.value, customTaxPercent: '' })}
+                            >
+                                <option value="included">Tax Included (in price)</option>
+                                <option value="18%">Tax 18%</option>
+                                <option value="custom">Custom Tax %</option>
+                            </select>
+                            {productForm.tax === 'custom' && (
+                                <input
+                                    type="number"
+                                    placeholder="Enter custom tax % (e.g. 12)"
+                                    step="0.01"
+                                    min="0"
+                                    max="100"
+                                    required
+                                    className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-white border"
+                                    value={productForm.customTaxPercent}
+                                    onChange={e => setProductForm({ ...productForm, customTaxPercent: e.target.value })}
+                                />
+                            )}
+                        </div>
 
                         <div className="sm:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-2">Shipping</label>
