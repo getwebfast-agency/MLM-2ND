@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import API_URL from '../config';
 
 const Register = () => {
@@ -13,6 +14,7 @@ const Register = () => {
         password: '',
         referral_code: refCode
     });
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
     const navigate = useNavigate();
@@ -25,8 +27,6 @@ const Register = () => {
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
-
-
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -53,6 +53,7 @@ const Register = () => {
                     {successMsg && <div className="text-indigo-600 text-center text-sm font-medium bg-indigo-50 p-2 rounded">{successMsg}</div>}
 
                     <div className="rounded-md shadow-sm -space-y-px">
+                        {/* Full Name */}
                         <div>
                             <input
                                 name="name"
@@ -64,6 +65,7 @@ const Register = () => {
                                 onChange={handleChange}
                             />
                         </div>
+                        {/* Email */}
                         <div>
                             <input
                                 name="email"
@@ -75,6 +77,7 @@ const Register = () => {
                                 onChange={handleChange}
                             />
                         </div>
+                        {/* Referral Code */}
                         <div>
                             <input
                                 name="referral_code"
@@ -86,16 +89,25 @@ const Register = () => {
                                 onChange={handleChange}
                             />
                         </div>
-                        <div>
+                        {/* Password with show/hide */}
+                        <div className="relative">
                             <input
                                 name="password"
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 required
                                 value={formData.password}
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Password"
                                 onChange={handleChange}
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center z-20 text-gray-400 hover:text-gray-600"
+                                tabIndex={-1}
+                            >
+                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
                         </div>
                     </div>
 
