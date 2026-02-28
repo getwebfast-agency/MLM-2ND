@@ -319,17 +319,16 @@ exports.resetUserPassword = async (req, res) => {
         const { id } = req.params;
         const { newPassword } = req.body;
 
-        if (!newPassword || newPassword.length < 6) {
-            return res.status(400).json({ message: 'Password must be at least 6 characters' });
+        if (!newPassword || newPassword.length < 4) {
+            return res.status(400).json({ message: 'Password must be at least 4 characters' });
         }
 
         const user = await User.findByPk(id);
         if (!user) return res.status(404).json({ message: 'User not found' });
 
-        // Hash new password using bcrypt
         const bcrypt = require('bcryptjs');
         const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(newPassword, salt);
+        user.password_hash = await bcrypt.hash(newPassword, salt);
         await user.save();
 
         res.json({ message: 'Password reset successfully' });
