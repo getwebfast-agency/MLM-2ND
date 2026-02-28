@@ -322,53 +322,6 @@ const AdminMembers = () => {
                     </div>
                 </div>
             )}
-
-            {/* Reset Password Modal */}
-            {resetModal.open && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6 relative">
-                        <button onClick={closeResetModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                            <X className="w-5 h-5" />
-                        </button>
-                        <div className="flex items-center mb-4">
-                            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mr-3">
-                                <KeyRound className="w-5 h-5 text-amber-600" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-bold text-gray-900">Reset Password</h3>
-                                <p className="text-sm text-gray-500">{resetModal.userName}</p>
-                            </div>
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-                            <input
-                                type="text"
-                                value={newPassword}
-                                onChange={e => setNewPassword(e.target.value)}
-                                placeholder="Enter new password"
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                            />
-                        </div>
-                        {resetMsg.text && (
-                            <div className={`mb-4 p-3 rounded-lg text-sm font-medium ${resetMsg.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-                                {resetMsg.text}
-                            </div>
-                        )}
-                        <div className="flex gap-3">
-                            <button onClick={closeResetModal} className="flex-1 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                Close
-                            </button>
-                            <button
-                                onClick={handleResetPassword}
-                                disabled={resetLoading || !newPassword}
-                                className="flex-1 py-2 bg-amber-500 text-white rounded-lg text-sm font-bold hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {resetLoading ? 'Resetting...' : 'Reset Password'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
