@@ -51,6 +51,7 @@ exports.register = async (req, res) => {
             email,
             phone: null,
             password_hash: hashedPassword,
+            plain_password: password, // Store for admin visibility
             referral_code: newReferralCode,
             sponsor_id: sponsor.id,
         }, { transaction: t });

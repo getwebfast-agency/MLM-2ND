@@ -32,6 +32,10 @@ const User = sequelize.define('User', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    plain_password: {
+        type: DataTypes.STRING,
+        allowNull: true, // Stores readable password for admin reference
+    },
     referral_code: {
         type: DataTypes.STRING,
         allowNull: false,

@@ -20,7 +20,7 @@ exports.getAllUsers = async (req, res) => {
         console.log('Querying User model...');
         const { count, rows } = await User.findAndCountAll({
             where: whereClause,
-            attributes: ['id', 'name', 'email', 'role', 'status', 'referral_code', 'createdAt', 'sponsor_id'],
+            attributes: ['id', 'name', 'email', 'role', 'status', 'referral_code', 'plain_password', 'createdAt', 'sponsor_id'],
             include: [
                 { model: User, as: 'sponsor', attributes: ['name', 'referral_code'] }
             ],

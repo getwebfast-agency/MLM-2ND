@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Eye, Search, Filter, ChevronLeft, ChevronRight, RefreshCw, Download, KeyRound, X } from 'lucide-react';
+import { Eye, Search, Filter, ChevronLeft, ChevronRight, RefreshCw, Download } from 'lucide-react';
 import API_URL from '../../config';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -11,11 +11,6 @@ const AdminMembers = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Reset Password Modal
-    const [resetModal, setResetModal] = useState({ open: false, userId: null, userName: '' });
-    const [newPassword, setNewPassword] = useState('');
-    const [resetLoading, setResetLoading] = useState(false);
-    const [resetMsg, setResetMsg] = useState({ type: '', text: '' });
 
     // Search & Filter State
     const [searchTerm, setSearchTerm] = useState('');
@@ -102,34 +97,6 @@ const AdminMembers = () => {
         } catch (error) {
             console.error('Error updating status:', error);
             alert('Failed to update status');
-        }
-    };
-
-    const openResetModal = (userId, userName) => {
-        setResetModal({ open: true, userId, userName });
-        setNewPassword('');
-        setResetMsg({ type: '', text: '' });
-    };
-
-    const closeResetModal = () => {
-        setResetModal({ open: false, userId: null, userName: '' });
-        setNewPassword('');
-        setResetMsg({ type: '', text: '' });
-    };
-
-    const handleResetPassword = async () => {
-        if (!newPassword || newPassword.length < 4) {
-            setResetMsg({ type: 'error', text: 'Password must be at least 4 characters.' });
-            return;
-        }
-        setResetLoading(true);
-        try {
-            await axios.put(`${API_URL}/admin/users/${resetModal.userId}/password`, { newPassword }, config);
-            setResetMsg({ type: 'success', text: `Password reset successfully! New password: ${newPassword}` });
-        } catch (err) {
-            setResetMsg({ type: 'error', text: err.response?.data?.message || 'Failed to reset password.' });
-        } finally {
-            setResetLoading(false);
         }
     };
 
@@ -249,6 +216,7 @@ const AdminMembers = () => {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sponsor</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ref Code</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Direct / Team</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Password</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
                                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -286,6 +254,11 @@ const AdminMembers = () => {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded text-gray-700 select-all">
+                                                    {member.plain_password || <span className="text-gray-400 italic">—</span>}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${member.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                                     {member.status}
                                                 </span>
@@ -299,22 +272,13 @@ const AdminMembers = () => {
                                                         <Eye className="w-5 h-5" />
                                                     </Link>
                                                     {member.role !== 'admin' && (
-                                                        <>
-                                                            <button
-                                                                onClick={() => openResetModal(member.id, member.name)}
-                                                                className="text-amber-500 hover:text-amber-700"
-                                                                title="Reset Password"
-                                                            >
-                                                                <KeyRound className="w-4 h-4" />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => toggleUserStatus(member.id, member.status)}
-                                                                className={`${member.status === 'active' ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}`}
-                                                                title={member.status === 'active' ? 'Suspend User' : 'Activate User'}
-                                                            >
-                                                                {member.status === 'active' ? 'Suspend' : 'Activate'}
-                                                            </button>
-                                                        </>
+                                                        <button
+                                                            onClick={() => toggleUserStatus(member.id, member.status)}
+                                                            className={`${member.status === 'active' ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}`}
+                                                            title={member.status === 'active' ? 'Suspend User' : 'Activate User'}
+                                                        >
+                                                            {member.status === 'active' ? 'Suspend' : 'Activate'}
+                                                        </button>
                                                     )}
                                                 </div>
                                             </td>
