@@ -7,7 +7,7 @@ const seedData = async () => {
         console.log('Database connected...');
 
         // 1. Ensure Admin Exists (Already done by seedAdmin.js, but good to have reference)
-        const adminEmail = 'faishalback@gmail.com';
+        const adminEmail = 'marathamall1@gmail.com';
         let admin = await User.findOne({ where: { email: adminEmail } });
 
         if (!admin) {

@@ -6,8 +6,8 @@ const seedAdmin = async () => {
         await sequelize.authenticate();
         console.log('Database connected...');
 
-        const email = 'faishalback@gmail.com';
-        const password = '00'; // User provided password
+        const email = 'marathamall1@gmail.com';
+        const password = 'Shailu@7387'; // Updated admin password
         const referral_code = 'JOINSM'; // User provided referral code
         const name = 'Admin User';
 

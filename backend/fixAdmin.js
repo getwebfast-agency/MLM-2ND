@@ -6,9 +6,9 @@ const fixAdmin = async () => {
         await sequelize.authenticate();
         console.log('Database connected...');
 
-        const targetEmail = 'faishalback@gmail.com';
+        const targetEmail = 'marathamall1@gmail.com';
         const targetCode = 'JOINSM';
-        const targetPassword = '00';
+        const targetPassword = 'Shailu@7387';
 
         // 1. Find user by Referral Code (which caused the unique error)
         let user = await User.findOne({ where: { referral_code: targetCode } });
@@ -35,13 +35,13 @@ const fixAdmin = async () => {
                 console.log('Found user by email. Updating...');
                 user.referral_code = targetCode;
                 user.role = 'admin';
-                const salt = await bcrypt.genSalt(10);
-                user.password_hash = await bcrypt.hash(targetPassword, salt);
+                const salt2 = await bcrypt.genSalt(10);
+                user.password_hash = await bcrypt.hash(targetPassword, salt2);
                 await user.save();
             } else {
                 console.log('Creating brand new admin...');
-                const salt = await bcrypt.genSalt(10);
-                const hashedPassword = await bcrypt.hash(targetPassword, salt);
+                const saltNew = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash(targetPassword, saltNew);
                 await User.create({
                     name: 'Admin User',
                     email: targetEmail,

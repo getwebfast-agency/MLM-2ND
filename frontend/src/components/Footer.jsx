@@ -43,10 +43,7 @@ const Footer = () => {
                     </div>
                 </div>
                 <div className="border-t border-gray-700 pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
-                    <p className="text-sm text-gray-500 mb-4 md:mb-0">&copy; {new Date().getFullYear()} Maratha Mall. All rights reserved.</p>
-                    <div className="flex space-x-6">
-                        <Link to="/admin" className="text-gray-500 hover:text-white text-sm">Admin Access</Link>
-                    </div>
+                    <p className="text-sm text-gray-500">&copy; {new Date().getFullYear()} Maratha Mall. All rights reserved.</p>
                 </div>
             </div>
         </footer>
