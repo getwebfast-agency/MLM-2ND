@@ -380,10 +380,11 @@ exports.deleteUser = async (req, res) => {
 exports.getMemberEarnings = async (req, res) => {
     try {
         const { search } = req.query;
-        let whereClause = {};
+        let whereClause = { role: 'member' }; // Only show members, not admin
 
         if (search) {
             whereClause = {
+                role: 'member',
                 [Op.or]: [
                     { name: { [Op.like]: `%${search}%` } },
                     { email: { [Op.like]: `%${search}%` } },
@@ -392,25 +393,29 @@ exports.getMemberEarnings = async (req, res) => {
             };
         }
 
-        const earnings = await User.findAll({
+        // Fetch all matching members
+        const members = await User.findAll({
             where: whereClause,
-            attributes: [
-                'id', 'name', 'email', 'referral_code', 'status',
-                [sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('earnings.amount')), 0), 'totalEarnings']
-            ],
-            include: [
-                {
-                    model: Commission,
-                    as: 'earnings',
-                    attributes: []
-                }
-            ],
-            group: ['User.id'],
-            order: [[sequelize.literal('totalEarnings'), 'DESC']],
-            subQuery: false
+            attributes: ['id', 'name', 'email', 'referral_code', 'status'],
+            order: [['name', 'ASC']]
         });
 
-        res.json(earnings);
+        // For each member, fetch their total commission earnings
+        const earningsData = await Promise.all(members.map(async (member) => {
+            const totalEarnings = await Commission.sum('amount', {
+                where: { user_id: member.id }
+            }) || 0;
+
+            return {
+                ...member.toJSON(),
+                totalEarnings
+            };
+        }));
+
+        // Sort by totalEarnings descending
+        earningsData.sort((a, b) => b.totalEarnings - a.totalEarnings);
+
+        res.json(earningsData);
     } catch (error) {
         console.error('Error fetching member earnings:', error);
         res.status(500).json({ message: 'Error fetching member earnings', error: error.message });
