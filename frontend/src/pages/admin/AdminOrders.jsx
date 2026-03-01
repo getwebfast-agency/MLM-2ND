@@ -327,9 +327,10 @@ const AdminOrders = () => {
                                                     {new Date(order.createdAt).toLocaleString()}
                                                 </p>
                                                 {order.status === 'cancelled' && order.cancel_reason && (
-                                                    <p className="mt-1 text-xs text-red-500">
-                                                        <span className="font-semibold">Cancellation Reason: </span>{order.cancel_reason}
-                                                    </p>
+                                                    <div className="mt-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-700">
+                                                        <span className="font-semibold">Cancellation Reason: </span>
+                                                        {order.cancel_reason}
+                                                    </div>
                                                 )}
                                             </div>
                                             <div className="flex flex-col items-end gap-2">

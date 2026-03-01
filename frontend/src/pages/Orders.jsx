@@ -37,7 +37,6 @@ const Orders = () => {
     const [acceptingId, setAcceptingId] = useState(null);
     const [confirmModal, setConfirmModal] = useState(null);
 
-    // Cancel modal state
     const [cancelModal, setCancelModal] = useState(null);
     const [cancelReason, setCancelReason] = useState('');
     const [cancellingId, setCancellingId] = useState(null);
@@ -88,7 +87,7 @@ const Orders = () => {
 
     const handleCancelOrder = async () => {
         if (!cancelReason.trim()) {
-            setCancelError('Please provide a reason for cancellation.');
+            setCancelError('Please provide a reason for the cancellation request.');
             return;
         }
         setCancellingId(cancelModal);
@@ -110,7 +109,11 @@ const Orders = () => {
         }
     };
 
-    if (loading) return <div className="flex justify-center items-center h-screen">Loading Orders...</div>;
+    if (loading) return (
+        <div className="flex justify-center items-center h-64">
+            <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+        </div>
+    );
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -125,14 +128,14 @@ const Orders = () => {
                                 <AlertTriangle className="w-5 h-5 text-red-600" />
                             </span>
                             <div>
-                                <h3 className="text-lg font-bold text-gray-900">Confirm Product Receipt</h3>
+                                <h3 className="text-lg font-bold text-gray-900">Accept Delivery</h3>
                                 <p className="text-sm text-gray-500 mt-0.5">Please review carefully before proceeding.</p>
                             </div>
                         </div>
                         <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-5 text-sm text-red-800 leading-relaxed">
                             <p className="font-semibold mb-1">🔴 Important Notice</p>
                             <p>
-                                Before confirming, please carefully inspect the product. If it is <strong>damaged, broken, or different</strong> from what you ordered, do <strong>NOT</strong> accept it.
+                                Before accepting delivery, please carefully inspect the product. If it is <strong>damaged, broken, or different</strong> from what you ordered, do <strong>NOT</strong> accept it.
                             </p>
                             <p className="mt-2 font-semibold">Once accepted, the product cannot be returned or replaced.</p>
                         </div>
@@ -145,7 +148,7 @@ const Orders = () => {
                                 disabled={acceptingId === confirmModal}
                                 className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold hover:from-green-600 hover:to-emerald-700 active:scale-95 transition disabled:opacity-60"
                             >
-                                {acceptingId === confirmModal ? 'Processing...' : '✓ Confirm Receipt'}
+                                {acceptingId === confirmModal ? 'Processing...' : '✓ Accept Delivery'}
                             </button>
                         </div>
                     </div>
@@ -166,7 +169,7 @@ const Orders = () => {
                             </div>
                         </div>
                         <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-sm text-amber-800">
-                            ⚠️ This will submit a <strong>cancellation request</strong> to the admin. The admin may approve or reject your request.
+                            ⚠️ This will submit a <strong>cancellation request</strong> to the admin. The admin may approve or reject your request based on the order status.
                         </div>
                         <div className="mb-4">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -217,57 +220,57 @@ const Orders = () => {
                             return (
                                 <li key={order.id}>
                                     <div className="px-4 py-4 sm:px-6">
-                                        {/* Header row */}
+                                        {/* Header */}
                                         <div className="flex items-center justify-between">
                                             <p className="text-sm font-medium text-indigo-600 truncate">
                                                 Order #{order.id.slice(0, 8)}
                                             </p>
-                                            <div className="ml-2 flex-shrink-0 flex">
-                                                <span className={`px-2.5 py-0.5 inline-flex items-center text-xs leading-5 font-semibold rounded-full ${sc.cls}`}>
-                                                    {sc.icon}{sc.label}
-                                                </span>
-                                            </div>
+                                            <span className={`px-2.5 py-0.5 inline-flex items-center text-xs leading-5 font-semibold rounded-full ${sc.cls}`}>
+                                                {sc.icon}{sc.label}
+                                            </span>
                                         </div>
 
-                                        {/* Meta row */}
+                                        {/* Meta */}
                                         <div className="mt-2 sm:flex sm:justify-between">
-                                            <div className="sm:flex">
+                                            <div className="sm:flex gap-4">
                                                 <p className="flex items-center text-sm text-gray-500">
-                                                    <Package className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
+                                                    <Package className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
                                                     {order.OrderItems?.length || 0} Item(s)
                                                 </p>
-                                                <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                                                    <Clock className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
+                                                <p className="flex items-center text-sm text-gray-500">
+                                                    <Clock className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
                                                     {new Date(order.createdAt).toLocaleDateString()}
                                                 </p>
                                             </div>
-                                            <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                                                <span className="font-bold text-gray-900">₹{order.total_amount}</span>
-                                            </div>
+                                            <p className="font-bold text-gray-900 text-sm mt-1 sm:mt-0">₹{order.total_amount}</p>
                                         </div>
 
-                                        {/* ── Cancellation Pending ── */}
+                                        {/* ── Cancellation Pending notice ── */}
                                         {order.status === 'cancellation_requested' && (
                                             <div className="mt-3 flex items-start gap-2 bg-orange-50 border border-orange-200 rounded-lg px-4 py-3">
                                                 <AlertCircle className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
                                                 <div className="text-sm text-orange-800">
-                                                    <p className="font-semibold">Cancellation Request Pending</p>
-                                                    <p className="mt-0.5 text-orange-700">Your cancellation request is currently under review by our team. You will be notified once a decision has been made.</p>
+                                                    <p className="font-semibold">Cancellation Request Pending Review</p>
+                                                    <p className="mt-0.5 text-orange-700">Your request is currently under review by our team. You will be notified once a decision has been made.</p>
                                                     {order.cancel_reason && (
-                                                        <p className="mt-1 text-xs text-orange-600"><span className="font-semibold">Your reason: </span>{order.cancel_reason}</p>
+                                                        <p className="mt-1.5 text-xs bg-orange-100 border border-orange-200 rounded-md px-2.5 py-1.5">
+                                                            <span className="font-semibold">Your Reason: </span>{order.cancel_reason}
+                                                        </p>
                                                     )}
                                                 </div>
                                             </div>
                                         )}
 
-                                        {/* ── Cancellation Rejected ── */}
+                                        {/* ── Cancellation Rejected notice ── */}
                                         {order.status === 'delivery_pending' && order.cancel_rejection_reason && (
                                             <div className="mt-3 flex items-start gap-2 bg-red-50 border border-red-300 rounded-lg px-4 py-3">
                                                 <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
                                                 <div className="text-sm text-red-800">
                                                     <p className="font-semibold">Cancellation Request Rejected</p>
-                                                    <p className="mt-1"><span className="font-semibold">Admin's Reason: </span>{order.cancel_rejection_reason}</p>
-                                                    <p className="mt-1 text-xs text-red-600">Your order remains active. You may still accept the delivery below.</p>
+                                                    <p className="mt-1 text-xs bg-red-100 border border-red-200 rounded-md px-2.5 py-1.5">
+                                                        <span className="font-semibold">Admin's Reason: </span>{order.cancel_rejection_reason}
+                                                    </p>
+                                                    <p className="mt-1.5 text-xs text-red-600">Your order remains active. Please proceed to accept the delivery below.</p>
                                                 </div>
                                             </div>
                                         )}
@@ -291,7 +294,7 @@ const Orders = () => {
                                                 <div className="flex items-start gap-2 mb-3">
                                                     <Truck className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                                                     <p className="text-sm text-blue-800 font-medium">
-                                                        Your order has been confirmed and is on its way. Once you receive and inspect the product, click <strong>"Confirm Receipt"</strong>.
+                                                        Your order has been confirmed and is on its way. Once you receive and inspect the product, click <strong>"Accept Delivery"</strong>.
                                                     </p>
                                                 </div>
                                                 <div className="mb-4 flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
@@ -299,21 +302,21 @@ const Orders = () => {
                                                     <div className="text-sm text-red-800 leading-relaxed">
                                                         <p className="font-bold mb-1">Important Notice:</p>
                                                         <p>
-                                                            Before confirming receipt, please thoroughly inspect the product. If it is <strong>damaged, broken, or differs</strong> from your order, do <strong>not</strong> accept it. Once accepted, it <strong>cannot be returned or replaced.</strong>
+                                                            Before accepting delivery, please thoroughly inspect the product. If it is <strong>damaged, broken, or differs</strong> from your order, do <strong>not</strong> accept it. Once accepted, it <strong>cannot be returned or replaced.</strong>
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-wrap gap-3">
                                                     <button
                                                         onClick={() => setConfirmModal(order.id)}
-                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-bold rounded-xl hover:from-green-600 hover:to-emerald-700 active:scale-95 transition shadow-sm"
+                                                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-bold rounded-xl hover:from-green-600 hover:to-emerald-700 active:scale-95 transition shadow-sm"
                                                     >
-                                                        <CheckCircle className="w-4 h-4" />
-                                                        Confirm Receipt
+                                                        <Truck className="w-4 h-4" />
+                                                        Accept Delivery
                                                     </button>
                                                     <button
                                                         onClick={() => openCancelModal(order.id)}
-                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-red-300 text-red-600 text-sm font-bold rounded-xl hover:bg-red-50 active:scale-95 transition shadow-sm"
+                                                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-red-300 text-red-600 text-sm font-bold rounded-xl hover:bg-red-50 active:scale-95 transition shadow-sm"
                                                     >
                                                         <XCircle className="w-4 h-4" />
                                                         Request Cancellation
@@ -342,9 +345,7 @@ const Orders = () => {
                                                                 <p className="text-sm font-medium text-gray-900 truncate">{item.Product?.name || 'Unknown Product'}</p>
                                                                 <p className="text-sm text-gray-500">Qty: {item.quantity} × ₹{item.price}</p>
                                                             </div>
-                                                            <div className="inline-flex items-center text-sm font-semibold text-gray-900">
-                                                                ₹{(item.quantity * item.price).toFixed(2)}
-                                                            </div>
+                                                            <p className="text-sm font-semibold text-gray-900">₹{(item.quantity * item.price).toFixed(2)}</p>
                                                         </li>
                                                     ))}
                                                 </ul>

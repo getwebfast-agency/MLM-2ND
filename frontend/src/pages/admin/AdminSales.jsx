@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import API_URL from '../../config';
-import { Truck, Package, Clock, CheckCircle, RefreshCw, XCircle } from 'lucide-react';
+import { Truck, Package, Clock, CheckCircle, RefreshCw, XCircle, AlertTriangle } from 'lucide-react';
 
 const AdminSales = () => {
     const [sales, setSales] = useState([]);
@@ -10,6 +10,12 @@ const AdminSales = () => {
     const [loading, setLoading] = useState(true);
     const [dpLoading, setDpLoading] = useState(true);
     const [cancelledLoading, setCancelledLoading] = useState(true);
+
+    // Cancel modal state (admin cancelling a delivery-pending order)
+    const [cancelModal, setCancelModal] = useState(null);   // orderId
+    const [cancelReason, setCancelReason] = useState('');
+    const [cancelError, setCancelError] = useState('');
+    const [cancellingId, setCancellingId] = useState(null);
 
     const token = localStorage.getItem('token');
     const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -55,10 +61,94 @@ const AdminSales = () => {
         fetchCancelledOrders();
     }, []);
 
+    const openCancelModal = (orderId) => {
+        setCancelModal(orderId);
+        setCancelReason('');
+        setCancelError('');
+    };
+
+    const closeCancelModal = () => {
+        setCancelModal(null);
+        setCancelReason('');
+        setCancelError('');
+    };
+
+    const handleAdminCancelOrder = async () => {
+        if (!cancelReason.trim()) {
+            setCancelError('Please provide a reason for cancellation.');
+            return;
+        }
+        setCancellingId(cancelModal);
+        try {
+            await axios.put(
+                `${API_URL}/admin/orders/${cancelModal}/approve-cancellation`,
+                {},
+                config
+            );
+            closeCancelModal();
+            fetchDeliveryPending();
+            fetchCancelledOrders();
+            fetchSales();
+        } catch (error) {
+            setCancelError(error.response?.data?.message || 'Failed to cancel order. Please try again.');
+        } finally {
+            setCancellingId(null);
+        }
+    };
+
     return (
         <div className="space-y-10">
 
-            {/* ── Delivery Pending Section ───────────────────────────── */}
+            {/* ── Admin Cancel Order Modal ── */}
+            {cancelModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+                        <div className="flex items-start gap-3 mb-4">
+                            <span className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                <AlertTriangle className="w-5 h-5 text-red-600" />
+                            </span>
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900">Cancel Order</h3>
+                                <p className="text-sm text-gray-500 mt-0.5">The customer will be notified of this cancellation.</p>
+                            </div>
+                        </div>
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-sm text-amber-800">
+                            ⚠️ This will permanently cancel the order. This action <strong>cannot be undone</strong>.
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Reason for Cancellation <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                rows={4}
+                                placeholder="e.g. Item out of stock, payment issue, customer request, etc."
+                                value={cancelReason}
+                                onChange={(e) => { setCancelReason(e.target.value); setCancelError(''); }}
+                                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 resize-none"
+                            />
+                            {cancelError && <p className="text-red-500 text-xs mt-1 font-medium">{cancelError}</p>}
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={closeCancelModal}
+                                disabled={cancellingId === cancelModal}
+                                className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition"
+                            >
+                                Go Back
+                            </button>
+                            <button
+                                onClick={handleAdminCancelOrder}
+                                disabled={cancellingId === cancelModal || !cancelReason.trim()}
+                                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold hover:from-red-600 hover:to-rose-700 transition disabled:opacity-50"
+                            >
+                                {cancellingId === cancelModal ? 'Cancelling...' : 'Cancel Order'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Delivery Pending Section ── */}
             <div>
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
@@ -119,7 +209,6 @@ const AdminSales = () => {
                                                     {order.OrderItems?.length || 0} item(s)
                                                 </span>
                                             </div>
-                                            {/* Items list */}
                                             <ul className="mt-2 space-y-0.5">
                                                 {order.OrderItems?.map(item => (
                                                     <li key={item.id} className="text-xs text-gray-500">
@@ -128,9 +217,16 @@ const AdminSales = () => {
                                                 ))}
                                             </ul>
                                         </div>
-                                        <div className="text-right flex-shrink-0">
+                                        <div className="text-right flex-shrink-0 flex flex-col items-end gap-2">
                                             <p className="text-base font-bold text-gray-900">₹{order.total_amount}</p>
-                                            <p className="mt-1 text-xs text-blue-600 font-medium">Awaiting member confirmation</p>
+                                            <p className="text-xs text-blue-600 font-medium">Awaiting member acceptance</p>
+                                            <button
+                                                onClick={() => openCancelModal(order.id)}
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg text-white bg-red-600 hover:bg-red-700 transition"
+                                            >
+                                                <XCircle className="w-3.5 h-3.5" />
+                                                Cancel Order
+                                            </button>
                                         </div>
                                     </div>
                                 </li>
@@ -140,7 +236,7 @@ const AdminSales = () => {
                 )}
             </div>
 
-            {/* ── Completed Sales History ───────────────────────────── */}
+            {/* ── Sales History ── */}
             <div>
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Sales History</h2>
                 {loading ? (
@@ -184,9 +280,7 @@ const AdminSales = () => {
                                                 <span className="text-gray-400">Direct</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                                            ₹{sale.total_amount}
-                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">₹{sale.total_amount}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-bold">
                                             ₹{sale.commissionGenerated ? parseFloat(sale.commissionGenerated).toFixed(2) : '0.00'}
                                         </td>
@@ -194,9 +288,7 @@ const AdminSales = () => {
                                 ))}
                                 {sales.length === 0 && (
                                     <tr>
-                                        <td colSpan="5" className="px-6 py-8 text-center text-sm text-gray-500">
-                                            No confirmed sales found.
-                                        </td>
+                                        <td colSpan="5" className="px-6 py-8 text-center text-sm text-gray-500">No confirmed sales found.</td>
                                     </tr>
                                 )}
                             </tbody>
@@ -204,7 +296,8 @@ const AdminSales = () => {
                     </div>
                 )}
             </div>
-            {/* ── Cancelled Orders ───────────────────────────── */}
+
+            {/* ── Cancelled Orders ── */}
             <div>
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
