@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Package, Clock, CheckCircle, Truck, AlertTriangle, XCircle } from 'lucide-react';
+import { Package, Clock, CheckCircle, Truck, AlertTriangle, XCircle, AlertCircle } from 'lucide-react';
 import API_URL from '../config';
 
 const statusConfig = {
     pending: {
-        label: 'Order Confirmation Pending',
+        label: 'Awaiting Confirmation',
         cls: 'bg-yellow-100 text-yellow-800',
         icon: <Clock className="w-3.5 h-3.5 mr-1" />,
     },
@@ -13,6 +13,11 @@ const statusConfig = {
         label: 'Delivery Pending',
         cls: 'bg-blue-100 text-blue-800',
         icon: <Truck className="w-3.5 h-3.5 mr-1" />,
+    },
+    cancellation_requested: {
+        label: 'Cancellation Pending',
+        cls: 'bg-orange-100 text-orange-800',
+        icon: <AlertCircle className="w-3.5 h-3.5 mr-1" />,
     },
     completed: {
         label: 'Completed',
@@ -30,10 +35,10 @@ const Orders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [acceptingId, setAcceptingId] = useState(null);
-    const [confirmModal, setConfirmModal] = useState(null); // orderId to confirm acceptance
+    const [confirmModal, setConfirmModal] = useState(null);
 
     // Cancel modal state
-    const [cancelModal, setCancelModal] = useState(null);   // orderId to cancel
+    const [cancelModal, setCancelModal] = useState(null);
     const [cancelReason, setCancelReason] = useState('');
     const [cancellingId, setCancellingId] = useState(null);
     const [cancelError, setCancelError] = useState('');
@@ -63,7 +68,7 @@ const Orders = () => {
             fetchOrders();
         } catch (error) {
             console.error('Accept delivery error:', error);
-            alert(error.response?.data?.message || 'Failed to accept delivery.');
+            alert(error.response?.data?.message || 'Failed to confirm delivery acceptance.');
         } finally {
             setAcceptingId(null);
         }
@@ -99,7 +104,7 @@ const Orders = () => {
             fetchOrders();
         } catch (error) {
             console.error('Cancel order error:', error);
-            setCancelError(error.response?.data?.message || 'Failed to cancel order. Please try again.');
+            setCancelError(error.response?.data?.message || 'Failed to submit cancellation request. Please try again.');
         } finally {
             setCancellingId(null);
         }
@@ -121,75 +126,63 @@ const Orders = () => {
                             </span>
                             <div>
                                 <h3 className="text-lg font-bold text-gray-900">Confirm Product Receipt</h3>
-                                <p className="text-sm text-gray-500 mt-0.5">Please read carefully before proceeding.</p>
+                                <p className="text-sm text-gray-500 mt-0.5">Please review carefully before proceeding.</p>
                             </div>
                         </div>
-
                         <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-5 text-sm text-red-800 leading-relaxed">
                             <p className="font-semibold mb-1">🔴 Important Notice</p>
                             <p>
-                                Before clicking <strong>"Product Accepted"</strong>, please carefully check the product.
-                                If the product is <strong>damaged, broken, or different</strong> from what you ordered,
-                                do <strong>NOT</strong> accept it.
+                                Before confirming, please carefully inspect the product. If it is <strong>damaged, broken, or different</strong> from what you ordered, do <strong>NOT</strong> accept it.
                             </p>
-                            <p className="mt-2 font-semibold">
-                                Once accepted, the product cannot be returned or replaced.
-                            </p>
+                            <p className="mt-2 font-semibold">Once accepted, the product cannot be returned or replaced.</p>
                         </div>
-
                         <div className="flex gap-3">
-                            <button
-                                onClick={() => setConfirmModal(null)}
-                                className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition"
-                            >
-                                Cancel
+                            <button onClick={() => setConfirmModal(null)} className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition">
+                                Go Back
                             </button>
                             <button
                                 onClick={() => handleAcceptDelivery(confirmModal)}
                                 disabled={acceptingId === confirmModal}
                                 className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold hover:from-green-600 hover:to-emerald-700 active:scale-95 transition disabled:opacity-60"
                             >
-                                {acceptingId === confirmModal ? 'Processing...' : '✓ Product Accepted'}
+                                {acceptingId === confirmModal ? 'Processing...' : '✓ Confirm Receipt'}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* ❌ Cancel Order Modal */}
+            {/* ❌ Request Cancellation Modal */}
             {cancelModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
                         <div className="flex items-start gap-3 mb-4">
-                            <span className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                                <XCircle className="w-5 h-5 text-red-600" />
+                            <span className="flex-shrink-0 w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                                <XCircle className="w-5 h-5 text-orange-600" />
                             </span>
                             <div>
-                                <h3 className="text-lg font-bold text-gray-900">Cancel Order</h3>
-                                <p className="text-sm text-gray-500 mt-0.5">Please tell us why you want to cancel this order.</p>
+                                <h3 className="text-lg font-bold text-gray-900">Request Order Cancellation</h3>
+                                <p className="text-sm text-gray-500 mt-0.5">Your request will be reviewed by the admin.</p>
                             </div>
                         </div>
-
-                        <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 mb-4 text-sm text-orange-800">
-                            ⚠️ Once cancelled, this action <strong>cannot be undone</strong>. Please make sure you want to proceed.
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-sm text-amber-800">
+                            ⚠️ This will submit a <strong>cancellation request</strong> to the admin. The admin may approve or reject your request.
                         </div>
-
                         <div className="mb-4">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Reason for cancellation <span className="text-red-500">*</span>
+                                Reason for Cancellation <span className="text-red-500">*</span>
                             </label>
                             <textarea
                                 rows={4}
-                                placeholder="e.g. I ordered the wrong product, I changed my mind, delivery delay, etc."
+                                placeholder="Please describe why you wish to cancel this order (e.g. wrong item ordered, delivery delay, changed decision, etc.)"
                                 value={cancelReason}
                                 onChange={(e) => { setCancelReason(e.target.value); setCancelError(''); }}
-                                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 resize-none"
+                                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none"
                             />
                             {cancelError && (
                                 <p className="text-red-500 text-xs mt-1 font-medium">{cancelError}</p>
                             )}
                         </div>
-
                         <div className="flex gap-3">
                             <button
                                 onClick={closeCancelModal}
@@ -201,9 +194,9 @@ const Orders = () => {
                             <button
                                 onClick={handleCancelOrder}
                                 disabled={cancellingId === cancelModal || !cancelReason.trim()}
-                                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold hover:from-red-600 hover:to-rose-700 active:scale-95 transition disabled:opacity-50"
+                                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold hover:from-orange-600 hover:to-red-600 active:scale-95 transition disabled:opacity-50"
                             >
-                                {cancellingId === cancelModal ? 'Cancelling...' : 'Confirm Cancel'}
+                                {cancellingId === cancelModal ? 'Submitting...' : 'Submit Request'}
                             </button>
                         </div>
                     </div>
@@ -214,7 +207,7 @@ const Orders = () => {
                 <div className="bg-white shadow rounded-lg p-6 text-center">
                     <Package className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-2 text-sm font-medium text-gray-900">No orders yet</h3>
-                    <p className="mt-1 text-sm text-gray-500">Go to the products page to make your first purchase.</p>
+                    <p className="mt-1 text-sm text-gray-500">Visit the products page to place your first order.</p>
                 </div>
             ) : (
                 <div className="bg-white shadow overflow-hidden sm:rounded-md">
@@ -224,6 +217,7 @@ const Orders = () => {
                             return (
                                 <li key={order.id}>
                                     <div className="px-4 py-4 sm:px-6">
+                                        {/* Header row */}
                                         <div className="flex items-center justify-between">
                                             <p className="text-sm font-medium text-indigo-600 truncate">
                                                 Order #{order.id.slice(0, 8)}
@@ -235,11 +229,12 @@ const Orders = () => {
                                             </div>
                                         </div>
 
+                                        {/* Meta row */}
                                         <div className="mt-2 sm:flex sm:justify-between">
                                             <div className="sm:flex">
                                                 <p className="flex items-center text-sm text-gray-500">
                                                     <Package className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
-                                                    {order.OrderItems?.length || 0} Items
+                                                    {order.OrderItems?.length || 0} Item(s)
                                                 </p>
                                                 <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
                                                     <Clock className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
@@ -251,56 +246,77 @@ const Orders = () => {
                                             </div>
                                         </div>
 
-                                        {/* Show cancel reason if order was cancelled */}
-                                        {order.status === 'cancelled' && order.cancel_reason && (
-                                            <div className="mt-3 flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg px-4 py-2.5">
-                                                <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-                                                <div className="text-sm text-red-700">
-                                                    <span className="font-semibold">Cancellation Reason: </span>
-                                                    {order.cancel_reason}
+                                        {/* ── Cancellation Pending ── */}
+                                        {order.status === 'cancellation_requested' && (
+                                            <div className="mt-3 flex items-start gap-2 bg-orange-50 border border-orange-200 rounded-lg px-4 py-3">
+                                                <AlertCircle className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
+                                                <div className="text-sm text-orange-800">
+                                                    <p className="font-semibold">Cancellation Request Pending</p>
+                                                    <p className="mt-0.5 text-orange-700">Your cancellation request is currently under review by our team. You will be notified once a decision has been made.</p>
+                                                    {order.cancel_reason && (
+                                                        <p className="mt-1 text-xs text-orange-600"><span className="font-semibold">Your reason: </span>{order.cancel_reason}</p>
+                                                    )}
                                                 </div>
                                             </div>
                                         )}
 
-                                        {/* Delivery Pending Action */}
+                                        {/* ── Cancellation Rejected ── */}
+                                        {order.status === 'delivery_pending' && order.cancel_rejection_reason && (
+                                            <div className="mt-3 flex items-start gap-2 bg-red-50 border border-red-300 rounded-lg px-4 py-3">
+                                                <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                                                <div className="text-sm text-red-800">
+                                                    <p className="font-semibold">Cancellation Request Rejected</p>
+                                                    <p className="mt-1"><span className="font-semibold">Admin's Reason: </span>{order.cancel_rejection_reason}</p>
+                                                    <p className="mt-1 text-xs text-red-600">Your order remains active. You may still accept the delivery below.</p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* ── Cancelled & Confirmed ── */}
+                                        {order.status === 'cancelled' && (
+                                            <div className="mt-3 flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg px-4 py-2.5">
+                                                <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                                                <div className="text-sm text-red-700">
+                                                    <p className="font-semibold">Order Cancelled — Cancellation Confirmed</p>
+                                                    {order.cancel_reason && (
+                                                        <p className="mt-0.5 text-xs"><span className="font-semibold">Reason: </span>{order.cancel_reason}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* ── Delivery Pending Actions ── */}
                                         {order.status === 'delivery_pending' && (
                                             <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4">
                                                 <div className="flex items-start gap-2 mb-3">
                                                     <Truck className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                                                     <p className="text-sm text-blue-800 font-medium">
-                                                        Your order has been confirmed and is on its way. Once you receive and verify the product, click <strong>"Product Accepted"</strong>.
+                                                        Your order has been confirmed and is on its way. Once you receive and inspect the product, click <strong>"Confirm Receipt"</strong>.
                                                     </p>
                                                 </div>
-
-                                                {/* 🔴 Important Warning */}
                                                 <div className="mb-4 flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
                                                     <span className="flex-shrink-0 text-red-600 text-base leading-snug">🔴</span>
                                                     <div className="text-sm text-red-800 leading-relaxed">
-                                                        <p className="font-bold mb-1">Important Note:</p>
+                                                        <p className="font-bold mb-1">Important Notice:</p>
                                                         <p>
-                                                            Before clicking <strong>"Product Accepted,"</strong> please carefully check the product.
-                                                            If the product is <strong>damaged, broken, or different</strong> from what you ordered,
-                                                            do <strong>not</strong> accept it.
-                                                            Once the product is accepted, it <strong>cannot be returned or replaced.</strong>
+                                                            Before confirming receipt, please thoroughly inspect the product. If it is <strong>damaged, broken, or differs</strong> from your order, do <strong>not</strong> accept it. Once accepted, it <strong>cannot be returned or replaced.</strong>
                                                         </p>
                                                     </div>
                                                 </div>
-
-                                                {/* Action Buttons */}
                                                 <div className="flex flex-wrap gap-3">
                                                     <button
                                                         onClick={() => setConfirmModal(order.id)}
                                                         className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-bold rounded-xl hover:from-green-600 hover:to-emerald-700 active:scale-95 transition shadow-sm"
                                                     >
                                                         <CheckCircle className="w-4 h-4" />
-                                                        Product Accepted
+                                                        Confirm Receipt
                                                     </button>
                                                     <button
                                                         onClick={() => openCancelModal(order.id)}
-                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-rose-600 text-white text-sm font-bold rounded-xl hover:from-red-600 hover:to-rose-700 active:scale-95 transition shadow-sm"
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-red-300 text-red-600 text-sm font-bold rounded-xl hover:bg-red-50 active:scale-95 transition shadow-sm"
                                                     >
                                                         <XCircle className="w-4 h-4" />
-                                                        Cancel Order
+                                                        Request Cancellation
                                                     </button>
                                                 </div>
                                             </div>

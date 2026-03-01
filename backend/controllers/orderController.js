@@ -191,41 +191,48 @@ exports.cancelOrder = async (req, res) => {
 
         if (!reason || reason.trim() === '') {
             await t.rollback();
-            return res.status(400).json({ message: 'Cancellation reason is required.' });
+            return res.status(400).json({ message: 'A cancellation reason is required.' });
         }
 
         const order = await Order.findByPk(id);
 
         if (!order) {
             await t.rollback();
-            return res.status(404).json({ message: 'Order not found' });
+            return res.status(404).json({ message: 'Order not found.' });
         }
 
         if (order.user_id !== userId) {
             await t.rollback();
-            return res.status(403).json({ message: 'Not your order' });
+            return res.status(403).json({ message: 'Unauthorised. This is not your order.' });
         }
 
         if (order.status === 'completed') {
             await t.rollback();
-            return res.status(400).json({ message: 'Cannot cancel a completed order' });
+            return res.status(400).json({ message: 'Completed orders cannot be cancelled.' });
         }
 
         if (order.status === 'cancelled') {
             await t.rollback();
-            return res.status(400).json({ message: 'Order is already cancelled' });
+            return res.status(400).json({ message: 'This order has already been cancelled.' });
         }
 
-        order.status = 'cancelled';
+        if (order.status === 'cancellation_requested') {
+            await t.rollback();
+            return res.status(400).json({ message: 'A cancellation request is already pending review.' });
+        }
+
+        // Submit cancellation request — admin must approve or reject
+        order.status = 'cancellation_requested';
         order.cancel_reason = reason.trim();
+        order.cancel_rejection_reason = null; // clear any previous rejection
         await order.save({ transaction: t });
 
         await t.commit();
-        res.json({ message: 'Order cancelled successfully', order });
+        res.json({ message: 'Cancellation request submitted successfully. Awaiting admin review.', order });
     } catch (error) {
         await t.rollback();
         console.error('Cancel Order Error:', error);
-        res.status(500).json({ message: 'Order cancellation failed', error: error.message });
+        res.status(500).json({ message: 'Failed to submit cancellation request.', error: error.message });
     }
 };
 

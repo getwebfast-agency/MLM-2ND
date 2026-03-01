@@ -12,7 +12,10 @@ const {
     resetUserPassword,
     changeSponsor,
     deleteUser,
-    getChartStats
+    getChartStats,
+    getCancellationRequests,
+    approveCancellation,
+    rejectCancellation
 } = require('../controllers/adminController');
 
 router.use(authenticateToken);
@@ -32,4 +35,10 @@ router.get('/earnings', require('../controllers/adminController').getMemberEarni
 router.get('/earnings/:id', require('../controllers/adminController').getMemberEarningDetails);
 router.get('/categories', getCategoryStats);
 
+// Cancellation Request Routes
+router.get('/cancellation-requests', getCancellationRequests);
+router.put('/orders/:id/approve-cancellation', approveCancellation);
+router.put('/orders/:id/reject-cancellation', rejectCancellation);
+
 module.exports = router;
+

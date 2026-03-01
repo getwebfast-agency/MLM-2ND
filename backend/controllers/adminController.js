@@ -377,6 +377,89 @@ exports.deleteUser = async (req, res) => {
     }
 };
 
+exports.getCancellationRequests = async (req, res) => {
+    try {
+        const requests = await Order.findAll({
+            where: { status: 'cancellation_requested' },
+            include: [
+                { model: User, attributes: ['id', 'name', 'email', 'referral_code'] },
+                { model: OrderItem, include: [{ model: Product, attributes: ['id', 'name', 'price'] }] }
+            ],
+            order: [['updatedAt', 'DESC']]
+        });
+        res.json(requests);
+    } catch (error) {
+        console.error('Error fetching cancellation requests:', error);
+        res.status(500).json({ message: 'Failed to fetch cancellation requests.', error: error.message });
+    }
+};
+
+exports.approveCancellation = async (req, res) => {
+    const t = await sequelize.transaction();
+    try {
+        const { id } = req.params;
+        const order = await Order.findByPk(id);
+
+        if (!order) {
+            await t.rollback();
+            return res.status(404).json({ message: 'Order not found.' });
+        }
+
+        if (order.status !== 'cancellation_requested') {
+            await t.rollback();
+            return res.status(400).json({ message: 'This order does not have a pending cancellation request.' });
+        }
+
+        order.status = 'cancelled';
+        order.cancel_rejection_reason = null;
+        await order.save({ transaction: t });
+
+        await t.commit();
+        res.json({ message: 'Cancellation request approved. Order has been cancelled.', order });
+    } catch (error) {
+        await t.rollback();
+        console.error('Approve Cancellation Error:', error);
+        res.status(500).json({ message: 'Failed to approve cancellation.', error: error.message });
+    }
+};
+
+exports.rejectCancellation = async (req, res) => {
+    const t = await sequelize.transaction();
+    try {
+        const { id } = req.params;
+        const { rejectionReason } = req.body;
+
+        if (!rejectionReason || rejectionReason.trim() === '') {
+            await t.rollback();
+            return res.status(400).json({ message: 'A rejection reason is required.' });
+        }
+
+        const order = await Order.findByPk(id);
+
+        if (!order) {
+            await t.rollback();
+            return res.status(404).json({ message: 'Order not found.' });
+        }
+
+        if (order.status !== 'cancellation_requested') {
+            await t.rollback();
+            return res.status(400).json({ message: 'This order does not have a pending cancellation request.' });
+        }
+
+        // Revert to delivery_pending and store rejection reason
+        order.status = 'delivery_pending';
+        order.cancel_rejection_reason = rejectionReason.trim();
+        await order.save({ transaction: t });
+
+        await t.commit();
+        res.json({ message: 'Cancellation request rejected. Order reverted to Delivery Pending.', order });
+    } catch (error) {
+        await t.rollback();
+        console.error('Reject Cancellation Error:', error);
+        res.status(500).json({ message: 'Failed to reject cancellation request.', error: error.message });
+    }
+};
+
 exports.getMemberEarnings = async (req, res) => {
     try {
         const { search } = req.query;

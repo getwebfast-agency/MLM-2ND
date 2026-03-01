@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import API_URL from '../../config';
-import { Truck, Package, Clock, CheckCircle, RefreshCw } from 'lucide-react';
+import { Truck, Package, Clock, CheckCircle, RefreshCw, XCircle } from 'lucide-react';
 
 const AdminSales = () => {
     const [sales, setSales] = useState([]);
     const [deliveryPendingOrders, setDeliveryPendingOrders] = useState([]);
+    const [cancelledOrders, setCancelledOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [dpLoading, setDpLoading] = useState(true);
+    const [cancelledLoading, setCancelledLoading] = useState(true);
 
     const token = localStorage.getItem('token');
     const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -35,9 +37,22 @@ const AdminSales = () => {
         }
     };
 
+    const fetchCancelledOrders = async () => {
+        setCancelledLoading(true);
+        try {
+            const res = await axios.get(`${API_URL}/shop/all-orders?status=cancelled`, config);
+            setCancelledOrders(res.data);
+        } catch (error) {
+            console.error('Error fetching cancelled orders:', error);
+        } finally {
+            setCancelledLoading(false);
+        }
+    };
+
     useEffect(() => {
         fetchSales();
         fetchDeliveryPending();
+        fetchCancelledOrders();
     }, []);
 
     return (
@@ -189,6 +204,93 @@ const AdminSales = () => {
                     </div>
                 )}
             </div>
+            {/* ── Cancelled Orders ───────────────────────────── */}
+            <div>
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-red-100">
+                            <XCircle className="w-4 h-4 text-red-600" />
+                        </span>
+                        <h2 className="text-xl font-bold text-gray-900">Cancelled Orders</h2>
+                        {cancelledOrders.length > 0 && (
+                            <span className="ml-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-600 text-white">
+                                {cancelledOrders.length}
+                            </span>
+                        )}
+                    </div>
+                    <button
+                        onClick={fetchCancelledOrders}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                    >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        Refresh
+                    </button>
+                </div>
+
+                {cancelledLoading ? (
+                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 flex justify-center">
+                        <div className="animate-spin w-6 h-6 border-2 border-red-500 border-t-transparent rounded-full" />
+                    </div>
+                ) : cancelledOrders.length === 0 ? (
+                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center">
+                        <CheckCircle className="mx-auto w-10 h-10 text-green-400 mb-2" />
+                        <p className="text-sm text-gray-500">No cancelled orders at this time.</p>
+                    </div>
+                ) : (
+                    <div className="bg-white rounded-xl border border-red-100 shadow-sm overflow-hidden">
+                        <ul className="divide-y divide-gray-100">
+                            {cancelledOrders.map((order) => (
+                                <li key={order.id} className="px-5 py-4 hover:bg-red-50/30 transition">
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <span className="text-sm font-semibold text-indigo-600">
+                                                    Order #{order.id.slice(0, 8)}...
+                                                </span>
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                                                    <XCircle className="w-3 h-3" /> Cancelled
+                                                </span>
+                                            </div>
+                                            <p className="mt-1 text-sm text-gray-700 font-medium">
+                                                {order.User?.name || 'Unknown'}
+                                                <span className="text-gray-400 font-normal"> — {order.User?.email || 'N/A'}</span>
+                                            </p>
+                                            <div className="mt-1 flex items-center gap-3 text-xs text-gray-400">
+                                                <span className="flex items-center gap-1">
+                                                    <Clock className="w-3 h-3" />
+                                                    {new Date(order.createdAt).toLocaleString()}
+                                                </span>
+                                                <span className="flex items-center gap-1">
+                                                    <Package className="w-3 h-3" />
+                                                    {order.OrderItems?.length || 0} item(s)
+                                                </span>
+                                            </div>
+                                            {order.cancel_reason && (
+                                                <div className="mt-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-700">
+                                                    <span className="font-semibold">Cancellation Reason: </span>
+                                                    {order.cancel_reason}
+                                                </div>
+                                            )}
+                                            <ul className="mt-2 space-y-0.5">
+                                                {order.OrderItems?.map(item => (
+                                                    <li key={item.id} className="text-xs text-gray-500">
+                                                        • {item.Product?.name || 'Unknown'} × {item.quantity} — ₹{item.price}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                        <div className="text-right flex-shrink-0">
+                                            <p className="text-base font-bold text-gray-900">₹{order.total_amount}</p>
+                                            <p className="mt-1 text-xs text-red-500 font-medium">Order Cancelled</p>
+                                        </div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+            </div>
+
         </div>
     );
 };

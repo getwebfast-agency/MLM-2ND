@@ -23,7 +23,7 @@ const Order = sequelize.define('Order', {
         type: DataTypes.STRING,
         defaultValue: 'pending',
         validate: {
-            isIn: [['pending', 'delivery_pending', 'completed', 'cancelled']]
+            isIn: [['pending', 'delivery_pending', 'completed', 'cancelled', 'cancellation_requested']]
         }
     },
     referral_code: {
@@ -31,6 +31,10 @@ const Order = sequelize.define('Order', {
         allowNull: true,
     },
     cancel_reason: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
+    cancel_rejection_reason: {
         type: DataTypes.TEXT,
         allowNull: true,
     },
