@@ -377,6 +377,49 @@ exports.deleteUser = async (req, res) => {
     }
 };
 
+// Admin directly cancels any active order (no cancellation_requested needed)
+exports.adminDirectCancelOrder = async (req, res) => {
+    const t = await sequelize.transaction();
+    try {
+        const { id } = req.params;
+        const { reason } = req.body;
+
+        if (!reason || reason.trim() === '') {
+            await t.rollback();
+            return res.status(400).json({ message: 'A cancellation reason is required.' });
+        }
+
+        const order = await Order.findByPk(id);
+
+        if (!order) {
+            await t.rollback();
+            return res.status(404).json({ message: 'Order not found.' });
+        }
+
+        if (order.status === 'completed') {
+            await t.rollback();
+            return res.status(400).json({ message: 'Completed orders cannot be cancelled.' });
+        }
+
+        if (order.status === 'cancelled') {
+            await t.rollback();
+            return res.status(400).json({ message: 'This order is already cancelled.' });
+        }
+
+        order.status = 'cancelled';
+        order.cancel_reason = reason.trim();
+        order.cancel_rejection_reason = null;
+        await order.save({ transaction: t });
+
+        await t.commit();
+        res.json({ message: 'Order cancelled successfully by admin.', order });
+    } catch (error) {
+        await t.rollback();
+        console.error('Admin Direct Cancel Error:', error);
+        res.status(500).json({ message: 'Failed to cancel order.', error: error.message });
+    }
+};
+
 exports.getCancellationRequests = async (req, res) => {
     try {
         const requests = await Order.findAll({

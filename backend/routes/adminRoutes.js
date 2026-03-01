@@ -15,7 +15,8 @@ const {
     getChartStats,
     getCancellationRequests,
     approveCancellation,
-    rejectCancellation
+    rejectCancellation,
+    adminDirectCancelOrder
 } = require('../controllers/adminController');
 
 router.use(authenticateToken);
@@ -35,10 +36,10 @@ router.get('/earnings', require('../controllers/adminController').getMemberEarni
 router.get('/earnings/:id', require('../controllers/adminController').getMemberEarningDetails);
 router.get('/categories', getCategoryStats);
 
-// Cancellation Request Routes
+// Cancellation Routes
 router.get('/cancellation-requests', getCancellationRequests);
-router.put('/orders/:id/approve-cancellation', approveCancellation);
-router.put('/orders/:id/reject-cancellation', rejectCancellation);
+router.put('/orders/:id/cancel', adminDirectCancelOrder);            // Admin direct cancel (any active order)
+router.put('/orders/:id/approve-cancellation', approveCancellation); // Approve a customer cancellation request
+router.put('/orders/:id/reject-cancellation', rejectCancellation);   // Reject a customer cancellation request
 
 module.exports = router;
-

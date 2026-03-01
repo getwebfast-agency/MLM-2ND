@@ -81,8 +81,8 @@ const AdminSales = () => {
         setCancellingId(cancelModal);
         try {
             await axios.put(
-                `${API_URL}/admin/orders/${cancelModal}/approve-cancellation`,
-                {},
+                `${API_URL}/admin/orders/${cancelModal}/cancel`,
+                { reason: cancelReason.trim() },
                 config
             );
             closeCancelModal();
