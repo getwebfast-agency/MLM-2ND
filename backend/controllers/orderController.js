@@ -186,6 +186,14 @@ exports.cancelOrder = async (req, res) => {
     const t = await sequelize.transaction();
     try {
         const { id } = req.params;
+        const { reason } = req.body;
+        const userId = req.user.id;
+
+        if (!reason || reason.trim() === '') {
+            await t.rollback();
+            return res.status(400).json({ message: 'Cancellation reason is required.' });
+        }
+
         const order = await Order.findByPk(id);
 
         if (!order) {
@@ -193,12 +201,23 @@ exports.cancelOrder = async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
+        if (order.user_id !== userId) {
+            await t.rollback();
+            return res.status(403).json({ message: 'Not your order' });
+        }
+
         if (order.status === 'completed') {
             await t.rollback();
-            return res.status(400).json({ message: 'Cannot cancel completed order' });
+            return res.status(400).json({ message: 'Cannot cancel a completed order' });
+        }
+
+        if (order.status === 'cancelled') {
+            await t.rollback();
+            return res.status(400).json({ message: 'Order is already cancelled' });
         }
 
         order.status = 'cancelled';
+        order.cancel_reason = reason.trim();
         await order.save({ transaction: t });
 
         await t.commit();

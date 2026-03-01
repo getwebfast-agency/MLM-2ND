@@ -30,6 +30,10 @@ const Order = sequelize.define('Order', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+    cancel_reason: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
 });
 
 module.exports = Order;

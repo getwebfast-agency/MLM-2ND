@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Package, Clock, CheckCircle, Truck, AlertTriangle } from 'lucide-react';
+import { Package, Clock, CheckCircle, Truck, AlertTriangle, XCircle } from 'lucide-react';
 import API_URL from '../config';
 
 const statusConfig = {
@@ -22,7 +22,7 @@ const statusConfig = {
     cancelled: {
         label: 'Cancelled',
         cls: 'bg-red-100 text-red-800',
-        icon: null,
+        icon: <XCircle className="w-3.5 h-3.5 mr-1" />,
     },
 };
 
@@ -30,7 +30,13 @@ const Orders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [acceptingId, setAcceptingId] = useState(null);
-    const [confirmModal, setConfirmModal] = useState(null); // orderId to confirm
+    const [confirmModal, setConfirmModal] = useState(null); // orderId to confirm acceptance
+
+    // Cancel modal state
+    const [cancelModal, setCancelModal] = useState(null);   // orderId to cancel
+    const [cancelReason, setCancelReason] = useState('');
+    const [cancellingId, setCancellingId] = useState(null);
+    const [cancelError, setCancelError] = useState('');
 
     const fetchOrders = async () => {
         try {
@@ -54,12 +60,48 @@ const Orders = () => {
             const config = { headers: { Authorization: `Bearer ${token}` } };
             await axios.put(`${API_URL}/shop/orders/${orderId}/accept-delivery`, {}, config);
             setConfirmModal(null);
-            fetchOrders(); // refresh
+            fetchOrders();
         } catch (error) {
             console.error('Accept delivery error:', error);
             alert(error.response?.data?.message || 'Failed to accept delivery.');
         } finally {
             setAcceptingId(null);
+        }
+    };
+
+    const openCancelModal = (orderId) => {
+        setCancelModal(orderId);
+        setCancelReason('');
+        setCancelError('');
+    };
+
+    const closeCancelModal = () => {
+        setCancelModal(null);
+        setCancelReason('');
+        setCancelError('');
+    };
+
+    const handleCancelOrder = async () => {
+        if (!cancelReason.trim()) {
+            setCancelError('Please provide a reason for cancellation.');
+            return;
+        }
+        setCancellingId(cancelModal);
+        try {
+            const token = localStorage.getItem('token');
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            await axios.put(
+                `${API_URL}/shop/orders/${cancelModal}/cancel`,
+                { reason: cancelReason.trim() },
+                config
+            );
+            closeCancelModal();
+            fetchOrders();
+        } catch (error) {
+            console.error('Cancel order error:', error);
+            setCancelError(error.response?.data?.message || 'Failed to cancel order. Please try again.');
+        } finally {
+            setCancellingId(null);
         }
     };
 
@@ -69,7 +111,7 @@ const Orders = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-6">My Orders</h1>
 
-            {/* Confirmation Modal */}
+            {/* ✅ Accept Delivery Confirmation Modal */}
             {confirmModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
@@ -108,6 +150,60 @@ const Orders = () => {
                                 className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold hover:from-green-600 hover:to-emerald-700 active:scale-95 transition disabled:opacity-60"
                             >
                                 {acceptingId === confirmModal ? 'Processing...' : '✓ Product Accepted'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ❌ Cancel Order Modal */}
+            {cancelModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
+                        <div className="flex items-start gap-3 mb-4">
+                            <span className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                <XCircle className="w-5 h-5 text-red-600" />
+                            </span>
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900">Cancel Order</h3>
+                                <p className="text-sm text-gray-500 mt-0.5">Please tell us why you want to cancel this order.</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 mb-4 text-sm text-orange-800">
+                            ⚠️ Once cancelled, this action <strong>cannot be undone</strong>. Please make sure you want to proceed.
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Reason for cancellation <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                rows={4}
+                                placeholder="e.g. I ordered the wrong product, I changed my mind, delivery delay, etc."
+                                value={cancelReason}
+                                onChange={(e) => { setCancelReason(e.target.value); setCancelError(''); }}
+                                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 resize-none"
+                            />
+                            {cancelError && (
+                                <p className="text-red-500 text-xs mt-1 font-medium">{cancelError}</p>
+                            )}
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={closeCancelModal}
+                                disabled={cancellingId === cancelModal}
+                                className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition disabled:opacity-60"
+                            >
+                                Go Back
+                            </button>
+                            <button
+                                onClick={handleCancelOrder}
+                                disabled={cancellingId === cancelModal || !cancelReason.trim()}
+                                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold hover:from-red-600 hover:to-rose-700 active:scale-95 transition disabled:opacity-50"
+                            >
+                                {cancellingId === cancelModal ? 'Cancelling...' : 'Confirm Cancel'}
                             </button>
                         </div>
                     </div>
@@ -155,6 +251,17 @@ const Orders = () => {
                                             </div>
                                         </div>
 
+                                        {/* Show cancel reason if order was cancelled */}
+                                        {order.status === 'cancelled' && order.cancel_reason && (
+                                            <div className="mt-3 flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg px-4 py-2.5">
+                                                <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                                                <div className="text-sm text-red-700">
+                                                    <span className="font-semibold">Cancellation Reason: </span>
+                                                    {order.cancel_reason}
+                                                </div>
+                                            </div>
+                                        )}
+
                                         {/* Delivery Pending Action */}
                                         {order.status === 'delivery_pending' && (
                                             <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4">
@@ -179,13 +286,23 @@ const Orders = () => {
                                                     </div>
                                                 </div>
 
-                                                <button
-                                                    onClick={() => setConfirmModal(order.id)}
-                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-bold rounded-xl hover:from-green-600 hover:to-emerald-700 active:scale-95 transition shadow-sm"
-                                                >
-                                                    <CheckCircle className="w-4 h-4" />
-                                                    Product Accepted
-                                                </button>
+                                                {/* Action Buttons */}
+                                                <div className="flex flex-wrap gap-3">
+                                                    <button
+                                                        onClick={() => setConfirmModal(order.id)}
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-bold rounded-xl hover:from-green-600 hover:to-emerald-700 active:scale-95 transition shadow-sm"
+                                                    >
+                                                        <CheckCircle className="w-4 h-4" />
+                                                        Product Accepted
+                                                    </button>
+                                                    <button
+                                                        onClick={() => openCancelModal(order.id)}
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-rose-600 text-white text-sm font-bold rounded-xl hover:from-red-600 hover:to-rose-700 active:scale-95 transition shadow-sm"
+                                                    >
+                                                        <XCircle className="w-4 h-4" />
+                                                        Cancel Order
+                                                    </button>
+                                                </div>
                                             </div>
                                         )}
 
